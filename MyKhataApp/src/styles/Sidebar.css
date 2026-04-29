@@ -1,7 +1,7 @@
 /* Sidebar */
 .sidebar {
   width: 250px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(124, 200, 248, 0.95) 0%, rgba(76, 163, 248, 0.95) 100%);
   color: white;
   padding: 0;
   position: fixed;
@@ -159,11 +159,12 @@
 }
 
 .logout-btn {
-  width: 100%;
+  width: 90%;
+  margin: 0 auto;
   padding: 10px 16px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: #ef4444;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid #dc2626;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -176,9 +177,10 @@
 }
 
 .logout-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
-  border-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: #dc2626;
+  border-color: #b91c1c;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px);
 }
 
 /* Mobile Responsive */

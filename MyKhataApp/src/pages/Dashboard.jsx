@@ -36,7 +36,9 @@ function Dashboard() {
       // Fetch I Owe Money entries
       const iOweResponse = await api.get('/entries/i-owe-money');
       const iOweData = iOweResponse.data.data.entries || [];
-      const iOweTotal = iOweData.reduce((sum, entry) => sum + entry.amount, 0);
+      const iOweTotal = iOweData
+        .filter(entry => entry.status === 'pending')
+        .reduce((sum, entry) => sum + entry.amount, 0);
       const iOwePending = iOweData.filter(e => e.status === 'pending').length;
       const iOweCompleted = iOweData.filter(e => e.status === 'completed').length;
       
@@ -48,7 +50,9 @@ function Dashboard() {
       // Fetch I'm Owed Money entries
       const iAmOwedResponse = await api.get('/entries/i-am-owed-money');
       const iAmOwedData = iAmOwedResponse.data.data.entries || [];
-      const iAmOwedTotal = iAmOwedData.reduce((sum, entry) => sum + entry.amount, 0);
+      const iAmOwedTotal = iAmOwedData
+        .filter(entry => entry.status === 'pending')
+        .reduce((sum, entry) => sum + entry.amount, 0);
       const iAmOwedPending = iAmOwedData.filter(e => e.status === 'pending').length;
       const iAmOwedCompleted = iAmOwedData.filter(e => e.status === 'completed').length;
       

@@ -33,7 +33,10 @@ function IAmOwedMoneyPage() {
       const response = await api.get('/entries/i-am-owed-money');
       const entriesData = response.data.data.entries || [];
       setEntries(entriesData);
-      const total = entriesData.reduce((sum, entry) => sum + entry.amount, 0);
+      // Only count pending entries in total
+      const total = entriesData
+        .filter(entry => entry.status === 'pending')
+        .reduce((sum, entry) => sum + entry.amount, 0);
       setTotalAmount(total);
     } catch (error) {
       console.error('Error fetching entries:', error);
