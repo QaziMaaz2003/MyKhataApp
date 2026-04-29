@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { FiArrowRight, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
+import { FiArrowRight, FiMenu } from 'react-icons/fi';
+import Sidebar from '../components/Sidebar';
+import StatsCard from '../components/StatsCard';
+import BreakdownChart from '../components/BreakdownChart';
 import '../styles/Dashboard.css';
 
 function Dashboard() {
@@ -12,6 +15,15 @@ function Dashboard() {
   const [recentEntries, setRecentEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Analytics state
+  const [iOweEntries, setIOweEntries] = useState([]);
+  const [iAmOwedEntries, setIAmOwedEntries] = useState([]);
+  const [iOwePendingCount, setIOWePendingCount] = useState(0);
+  const [iOweCompletedCount, setIOweCompletedCount] = useState(0);
+  const [iAmOwedPendingCount, setIAmOwedPendingCount] = useState(0);
+  const [iAmOwedCompletedCount, setIAmOwedCompletedCount] = useState(0);
+  
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -23,20 +35,32 @@ function Dashboard() {
       setLoading(true);
       // Fetch I Owe Money entries
       const iOweResponse = await api.get('/entries/i-owe-money');
-      const iOweEntries = iOweResponse.data.data || [];
-      const iOweTotal = iOweEntries.reduce((sum, entry) => sum + entry.amount, 0);
+      const iOweData = iOweResponse.data.data.entries || [];
+      const iOweTotal = iOweData.reduce((sum, entry) => sum + entry.amount, 0);
+      const iOwePending = iOweData.filter(e => e.status === 'pending').length;
+      const iOweCompleted = iOweData.filter(e => e.status === 'completed').length;
+      
       setTotalIOweMoney(iOweTotal);
+      setIOweEntries(iOweData);
+      setIOWePendingCount(iOwePending);
+      setIOweCompletedCount(iOweCompleted);
 
       // Fetch I'm Owed Money entries
       const iAmOwedResponse = await api.get('/entries/i-am-owed-money');
-      const iAmOwedEntries = iAmOwedResponse.data.data || [];
-      const iAmOwedTotal = iAmOwedEntries.reduce((sum, entry) => sum + entry.amount, 0);
+      const iAmOwedData = iAmOwedResponse.data.data.entries || [];
+      const iAmOwedTotal = iAmOwedData.reduce((sum, entry) => sum + entry.amount, 0);
+      const iAmOwedPending = iAmOwedData.filter(e => e.status === 'pending').length;
+      const iAmOwedCompleted = iAmOwedData.filter(e => e.status === 'completed').length;
+      
       setTotalAmOwedMoney(iAmOwedTotal);
+      setIAmOwedEntries(iAmOwedData);
+      setIAmOwedPendingCount(iAmOwedPending);
+      setIAmOwedCompletedCount(iAmOwedCompleted);
 
       // Combine and sort recent entries
       const combined = [
-        ...iOweEntries.map(e => ({ ...e, type: 'owe' })),
-        ...iAmOwedEntries.map(e => ({ ...e, type: 'owed' }))
+        ...iOweData.map(e => ({ ...e, type: 'owe' })),
+        ...iAmOwedData.map(e => ({ ...e, type: 'owed' }))
       ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
 
       setRecentEntries(combined);
@@ -69,43 +93,13 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
-      <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <h2>MyKhata</h2>
-          <button
-            className="close-sidebar"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <FiX size={24} />
-          </button>
-        </div>
-
-        <div className="sidebar-content">
-          <ul className="nav-links">
-            <li>
-              <Link to="/" className="nav-link active" onClick={() => setSidebarOpen(false)}>
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link to="/i-owe-money" className="nav-link" onClick={() => setSidebarOpen(false)}>
-                I Owe Money
-              </Link>
-            </li>
-            <li>
-              <Link to="/i-am-owed-money" className="nav-link" onClick={() => setSidebarOpen(false)}>
-                I'm Owed Money
-              </Link>
-            </li>
-          </ul>
-
-          <button className="logout-btn" onClick={handleLogout}>
-            <FiLogOut size={18} />
-            Logout
-          </button>
-        </div>
-      </nav>
+      {/* Sidebar Component */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+        user={user}
+      />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -162,6 +156,90 @@ function Dashboard() {
                 {(totalAmOwedMoney - totalIOweMoney).toLocaleString('en-PK')} PKR
               </h2>
             </div>
+          </div>
+        </div>
+
+        {/* Analytics Section */}
+        <div className="analytics-section">
+          <h2 className="section-title">Analytics & Breakdown</h2>
+          
+          <div className="analytics-grid">
+            {/* I Owe Money Stats */}
+            <div className="analytics-card">
+              <h3 className="analytics-title">I Owe Money</h3>
+              <div className="analytics-stats">
+                <StatsCard
+                  title="Active Debts"
+                  value={iOwePendingCount}
+                  icon="📋"
+                  color="pending"
+                  description={`${iOweEntries.length} total entries`}
+                />
+                <StatsCard
+                  title="Settled"
+                  value={iOweCompletedCount}
+                  icon="✓"
+                  color="success"
+                  description="Paid off"
+                />
+              </div>
+              <BreakdownChart
+                pendingCount={iOwePendingCount}
+                completedCount={iOweCompletedCount}
+                title="Status Breakdown"
+              />
+            </div>
+
+            {/* I'm Owed Money Stats */}
+            <div className="analytics-card">
+              <h3 className="analytics-title">I'm Owed Money</h3>
+              <div className="analytics-stats">
+                <StatsCard
+                  title="Pending Payments"
+                  value={iAmOwedPendingCount}
+                  icon="⏳"
+                  color="pending"
+                  description={`${iAmOwedEntries.length} total entries`}
+                />
+                <StatsCard
+                  title="Received"
+                  value={iAmOwedCompletedCount}
+                  icon="✓"
+                  color="success"
+                  description="Completed"
+                />
+              </div>
+              <BreakdownChart
+                pendingCount={iAmOwedPendingCount}
+                completedCount={iAmOwedCompletedCount}
+                title="Status Breakdown"
+              />
+            </div>
+          </div>
+
+          {/* Summary Stats */}
+          <div className="summary-stats">
+            <StatsCard
+              title="Total Entries"
+              value={iOweEntries.length + iAmOwedEntries.length}
+              icon="📊"
+              color="info"
+              description="Across both categories"
+            />
+            <StatsCard
+              title="Pending Count"
+              value={iOwePendingCount + iAmOwedPendingCount}
+              icon="⚠️"
+              color="warning"
+              description="Awaiting action"
+            />
+            <StatsCard
+              title="Completed Count"
+              value={iOweCompletedCount + iAmOwedCompletedCount}
+              icon="✓"
+              color="success"
+              description="All settled"
+            />
           </div>
         </div>
 

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { FiMenu, FiX, FiLogOut, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiMenu, FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
+import Sidebar from '../components/Sidebar';
+import AddEditEntryForm from '../components/AddEditEntryForm';
+import ImageLightbox from '../components/ImageLightbox';
 import '../styles/EntriesPage.css';
 
 function IAmOwedMoneyPage() {
@@ -11,6 +14,10 @@ function IAmOwedMoneyPage() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -21,7 +28,7 @@ function IAmOwedMoneyPage() {
     try {
       setLoading(true);
       const response = await api.get('/entries/i-am-owed-money');
-      const entriesData = response.data.data || [];
+      const entriesData = response.data.data.entries || [];
       setEntries(entriesData);
       const total = entriesData.reduce((sum, entry) => sum + entry.amount, 0);
       setTotalAmount(total);
@@ -31,6 +38,24 @@ function IAmOwedMoneyPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteEntry = (id) => {
+    handleDelete(id);
+  };
+
+  const handleEditEntry = (entry) => {
+    setEditingEntry(entry);
+    setShowModal(true);
+  };
+
+  const handleAddEntry = () => {
+    setEditingEntry(null);
+    setShowModal(true);
+  };
+
+  const handleModalSave = () => {
+    fetchEntries();
   };
 
   const handleDelete = async (id) => {
@@ -44,6 +69,14 @@ function IAmOwedMoneyPage() {
         toast.error('Failed to delete entry');
       }
     }
+  };
+
+  const openImageLightbox = (imageUrl) => {
+    setLightboxImage(imageUrl);
+  };
+
+  const closeLightbox = () => {
+    setLightboxImage(null);
   };
 
   const handleLogout = () => {
@@ -71,43 +104,12 @@ function IAmOwedMoneyPage() {
 
   return (
     <div className="page-container">
-      {/* Sidebar */}
-      <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <h2>MyKhata</h2>
-          <button
-            className="close-sidebar"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <FiX size={24} />
-          </button>
-        </div>
-
-        <div className="sidebar-content">
-          <ul className="nav-links">
-            <li>
-              <Link to="/" className="nav-link" onClick={() => setSidebarOpen(false)}>
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link to="/i-owe-money" className="nav-link" onClick={() => setSidebarOpen(false)}>
-                I Owe Money
-              </Link>
-            </li>
-            <li>
-              <Link to="/i-am-owed-money" className="nav-link active" onClick={() => setSidebarOpen(false)}>
-                I'm Owed Money
-              </Link>
-            </li>
-          </ul>
-
-          <button className="logout-btn" onClick={handleLogout}>
-            <FiLogOut size={18} />
-            Logout
-          </button>
-        </div>
-      </nav>
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+        user={user}
+      />
 
       {/* Main Content */}
       <main className="page-main">
@@ -134,17 +136,29 @@ function IAmOwedMoneyPage() {
             </div>
             <p className="entries-count">{entries.length} entries</p>
           </div>
-          <button className="btn btn-primary btn-add">
-            <FiPlus size={20} />
-            Add Entry
-          </button>
         </div>
 
         {/* Entries List */}
         <div className="entries-section">
+          {/* Search Bar */}
+          <div className="search-bar-container">
+            <FiSearch className="search-bar-icon" size={18} />
+            <input
+              type="text"
+              className="search-bar"
+              placeholder="Search by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
           {entries.length > 0 ? (
             <div className="entries-grid">
-              {entries.map((entry) => (
+              {entries
+                .filter((entry) =>
+                  entry.personName.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((entry) => (
                 <div key={entry.id} className="entry-card">
                   <div className="entry-header">
                     <h3>{entry.personName}</h3>
@@ -185,19 +199,22 @@ function IAmOwedMoneyPage() {
                   </div>
 
                   {entry.billImageUrl && (
-                    <div className="entry-image">
+                    <div className="entry-image" onClick={() => openImageLightbox(entry.billImageUrl)}>
                       <img src={entry.billImageUrl} alt="Bill" />
+                      <div className="image-overlay">
+                        <span className="view-label">Click to view</span>
+                      </div>
                     </div>
                   )}
 
                   <div className="entry-actions">
-                    <button className="btn btn-sm btn-edit">
+                    <button className="btn btn-sm btn-edit" onClick={() => handleEditEntry(entry)}>
                       <FiEdit2 size={16} />
                       Edit
                     </button>
                     <button
                       className="btn btn-sm btn-delete"
-                      onClick={() => handleDelete(entry.id)}
+                      onClick={() => handleDeleteEntry(entry.id)}
                     >
                       <FiTrash2 size={16} />
                       Delete
@@ -211,14 +228,41 @@ function IAmOwedMoneyPage() {
               <div className="empty-icon">📋</div>
               <h3>No entries yet</h3>
               <p>Start by adding your first entry</p>
-              <button className="btn btn-primary">
+              <button className="btn btn-primary" onClick={handleAddEntry}>
                 <FiPlus size={20} />
                 Add Entry
               </button>
             </div>
           )}
         </div>
+
+        {/* Floating Add Entry Button */}
+        {entries.length > 0 && (
+          <button className="fab-button" onClick={handleAddEntry} title="Add Entry">
+            <FiPlus size={24} />
+          </button>
+        )}
       </main>
+
+      {/* Add/Edit Entry Modal */}
+      <AddEditEntryForm
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditingEntry(null);
+        }}
+        entryType="i-am-owed-money"
+        editingEntry={editingEntry}
+        onSave={handleModalSave}
+      />
+
+      {/* Image Lightbox */}
+      <ImageLightbox
+        isOpen={!!lightboxImage}
+        imageUrl={lightboxImage}
+        alt="Bill Image"
+        onClose={closeLightbox}
+      />
     </div>
   );
 }
