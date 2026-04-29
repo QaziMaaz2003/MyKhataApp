@@ -191,13 +191,20 @@
   flex: 1;
 }
 
-/* Search Bar */
-.search-bar-container {
+/* Search and Filter Bar */
+.search-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-bar-container {
   position: relative;
   display: inline-block;
-  width: 100%;
-  max-width: 400px;
+  flex: 1;
+  min-width: 250px;
 }
 
 .search-bar-icon {
@@ -211,7 +218,7 @@
 
 .search-bar {
   width: 100%;
-  padding: 12px 16px 12px 42px;
+  padding: 10px 14px 10px 40px;
   border: 2px solid #e9ecef;
   border-radius: 8px;
   font-size: 14px;
@@ -227,6 +234,68 @@
 
 .search-bar::placeholder {
   color: #adb5bd;
+}
+
+/* Filter Controls */
+.filter-select {
+  padding: 10px 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  color: #212529;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 130px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #7cc8f8;
+  box-shadow: 0 0 0 3px rgba(124, 200, 248, 0.1);
+}
+
+.filter-select:disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Filter Buttons */
+.filter-button {
+  padding: 10px 16px;
+  border: 2px solid #7cc8f8;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.apply-btn {
+  background-color: #7cc8f8;
+  color: white;
+}
+
+.apply-btn:hover {
+  background-color: #4ca3f8;
+  border-color: #4ca3f8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 200, 248, 0.3);
+}
+
+.clear-btn {
+  background-color: white;
+  color: #7cc8f8;
+}
+
+.clear-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #4ca3f8;
+  color: #4ca3f8;
+  transform: translateY(-2px);
 }
 
 .entries-grid {
@@ -560,6 +629,26 @@
 
   .entries-section {
     padding: 16px;
+  }
+
+  .search-filter-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-bar-container {
+    min-width: unset;
+    flex: 1;
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .filter-button {
+    width: 100%;
   }
 
   .entries-grid {

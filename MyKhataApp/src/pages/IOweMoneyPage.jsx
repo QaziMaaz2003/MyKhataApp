@@ -18,6 +18,9 @@ function IOweMoneyPage() {
   const [editingEntry, setEditingEntry] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('none');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [appliedFilters, setAppliedFilters] = useState({ sortBy: 'none', sortOrder: 'asc' });
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -98,6 +101,44 @@ function IOweMoneyPage() {
     return status === 'completed' ? '✓ Completed' : '● Pending';
   };
 
+  const getSortedEntries = () => {
+    let sorted = entries
+      .filter((entry) =>
+        entry.personName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+    if (appliedFilters.sortBy !== 'none' && sorted.length > 0) {
+      sorted = [...sorted].sort((a, b) => {
+        let compareA, compareB;
+
+        if (appliedFilters.sortBy === 'amount') {
+          compareA = a.amount;
+          compareB = b.amount;
+        } else if (appliedFilters.sortBy === 'date') {
+          compareA = new Date(a.date).getTime();
+          compareB = new Date(b.date).getTime();
+        } else if (appliedFilters.sortBy === 'dueDate') {
+          compareA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+          compareB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+        }
+
+        return appliedFilters.sortOrder === 'asc' ? compareA - compareB : compareB - compareA;
+      });
+    }
+
+    return sorted;
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedFilters({ sortBy, sortOrder });
+  };
+
+  const handleClearFilters = () => {
+    setSortBy('none');
+    setSortOrder('asc');
+    setAppliedFilters({ sortBy: 'none', sortOrder: 'asc' });
+  };
+
   if (loading) {
     return <div className="loading">Loading entries...</div>;
   }
@@ -140,25 +181,52 @@ function IOweMoneyPage() {
 
         {/* Entries List */}
         <div className="entries-section">
-          {/* Search Bar */}
-          <div className="search-bar-container">
-            <FiSearch className="search-bar-icon" size={18} />
-            <input
-              type="text"
-              className="search-bar"
-              placeholder="Search by name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          {/* Search and Filter Bar */}
+          <div className="search-filter-bar">
+            <div className="search-bar-container">
+              <FiSearch className="search-bar-icon" size={18} />
+              <input
+                type="text"
+                className="search-bar"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="filter-select"
+            >
+              <option value="none">Sort By</option>
+              <option value="amount">Amount</option>
+              <option value="date">Date Taken</option>
+              <option value="dueDate">Due Date</option>
+            </select>
+
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="filter-select"
+              disabled={sortBy === 'none'}
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+
+            <button className="filter-button apply-btn" onClick={handleApplyFilters}>
+              Apply
+            </button>
+
+            <button className="filter-button clear-btn" onClick={handleClearFilters}>
+              Clear
+            </button>
           </div>
 
           {entries.length > 0 ? (
             <div className="entries-grid">
-              {entries
-                .filter((entry) =>
-                  entry.personName.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-                .map((entry) => (
+              {getSortedEntries().map((entry) => (
                 <div key={entry.id} className="entry-card">
                   <div className="entry-header">
                     <h3>{entry.personName}</h3>
