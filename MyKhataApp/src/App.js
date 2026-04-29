@@ -4,7 +4,9 @@ import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import IOweMoneyPage from './pages/IOweMoneyPage';
+import IAmOwedMoneyPage from './pages/IAmOwedMoneyPage';
 import './App.css';
 
 function App() {
@@ -21,7 +23,23 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Home />
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/i-owe-money"
+          element={
+            <ProtectedRoute>
+              <IOweMoneyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/i-am-owed-money"
+          element={
+            <ProtectedRoute>
+              <IAmOwedMoneyPage />
             </ProtectedRoute>
           }
         />
