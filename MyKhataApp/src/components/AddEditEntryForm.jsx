@@ -154,6 +154,38 @@ function AddEditEntryForm({ isOpen, onClose, entryType, onSave, editingEntry }) 
     }
   };
 
+  const handleRemoveImage = async () => {
+    try {
+      // If there's an existing image URL from editing, try to delete from Cloudinary
+      if (formData.billImageUrl && editingEntry) {
+        try {
+          await api.post('/delete-image', {
+            url: formData.billImageUrl
+          });
+        } catch (error) {
+          console.error('Error deleting image from Cloudinary:', error);
+        }
+      }
+
+      // Reset file input
+      const fileInput = document.getElementById('billImage');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+
+      // Clear preview and form data
+      setImagePreview('');
+      setFormData(prev => ({
+        ...prev,
+        billImageUrl: ''
+      }));
+      toast.success('Image removed');
+    } catch (error) {
+      console.error('Error removing image:', error);
+      toast.error('Failed to remove image');
+    }
+  };
+
   const validateForm = () => {
     if (!formData.personName.trim()) {
       toast.error('Person name is required');
@@ -393,19 +425,13 @@ function AddEditEntryForm({ isOpen, onClose, entryType, onSave, editingEntry }) 
                 disabled={uploading}
                 hidden
               />
-              {imagePreview && (
+              {imagePreview && formData.billImageUrl && (
                 <div className="image-preview">
                   <img src={imagePreview} alt="Bill preview" />
                   <button
                     type="button"
                     className="remove-image"
-                    onClick={() => {
-                      setImagePreview('');
-                      setFormData(prev => ({
-                        ...prev,
-                        billImageUrl: ''
-                      }));
-                    }}
+                    onClick={handleRemoveImage}
                   >
                     ✕
                   </button>

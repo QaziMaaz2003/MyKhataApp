@@ -7,6 +7,8 @@ import '../styles/Auth.css';
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const errorTimeoutRef = React.useRef(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -18,6 +20,7 @@ export default function Login() {
       ...prev,
       [name]: value,
     }));
+    setError(''); // Clear error when user starts typing
   };
 
   const validateForm = () => {
@@ -36,6 +39,21 @@ export default function Login() {
     return true;
   };
 
+  const showErrorMessage = (message) => {
+    setError(message);
+    
+    // Clear any existing timeout
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+    }
+    
+    // Set new timeout to clear error after 4 seconds
+    errorTimeoutRef.current = setTimeout(() => {
+      setError('');
+      errorTimeoutRef.current = null;
+    }, 4000);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -44,6 +62,7 @@ export default function Login() {
     }
 
     setLoading(true);
+    setError('');
     try {
       const response = await api.post('/auth/login', {
         email: formData.email,
@@ -60,18 +79,33 @@ export default function Login() {
       navigate('/dashboard');
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
-      toast.error(errorMessage);
+      showErrorMessage(errorMessage);
       console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  React.useEffect(() => {
+    return () => {
+      // Cleanup timeout on component unmount
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h1 className="auth-title">Welcome Back</h1>
         <p className="auth-subtitle">Login to your KhataApp account</p>
+
+        {error && (
+          <div className="error-alert">
+            <p className="error-message">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="auth-form">
           {/* Email */}
