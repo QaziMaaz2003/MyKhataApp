@@ -165,85 +165,56 @@ function Dashboard() {
 
         {/* Analytics Section */}
         <div className="analytics-section">
-          <h2 className="section-title">Analytics & Breakdown</h2>
+          <h2 className="section-title">Your Financial Summary</h2>
           
           <div className="analytics-grid">
-            {/* I Owe Money Stats */}
-            <div className="analytics-card">
-              <h3 className="analytics-title">I Owe Money</h3>
-              <div className="analytics-stats">
-                <StatsCard
-                  title="Active Debts"
-                  value={iOwePendingCount}
-                  icon="📋"
-                  color="pending"
-                  description={`${iOweEntries.length} total entries`}
-                />
-                <StatsCard
-                  title="Settled"
-                  value={iOweCompletedCount}
-                  icon="✓"
-                  color="success"
-                  description="Paid off"
-                />
+            {/* I Owe Money Card */}
+            <div className="analytics-card owe-summary-card">
+              <div className="card-header">
+                <h3 className="card-heading">I Owe Money</h3>
+                <div className="card-badge pending-badge">{iOweEntries.length} entries</div>
+              </div>
+              <div className="summary-row">
+                <div className="summary-item">
+                  <span className="summary-label">Pending</span>
+                  <span className="summary-value pending-color">{iOwePendingCount}</span>
+                  <span className="summary-amount">₨ {iOweEntries.filter(e => e.status === 'pending').reduce((sum, e) => sum + e.amount, 0).toLocaleString('en-PK')}</span>
+                </div>
+                <div className="summary-divider"></div>
+                <div className="summary-item">
+                  <span className="summary-label">Settled</span>
+                  <span className="summary-value success-color">{iOweCompletedCount}</span>
+                </div>
               </div>
               <BreakdownChart
                 pendingCount={iOwePendingCount}
                 completedCount={iOweCompletedCount}
-                title="Status Breakdown"
               />
             </div>
 
-            {/* I'm Owed Money Stats */}
-            <div className="analytics-card">
-              <h3 className="analytics-title">I'm Owed Money</h3>
-              <div className="analytics-stats">
-                <StatsCard
-                  title="Pending Payments"
-                  value={iAmOwedPendingCount}
-                  icon="⏳"
-                  color="pending"
-                  description={`${iAmOwedEntries.length} total entries`}
-                />
-                <StatsCard
-                  title="Received"
-                  value={iAmOwedCompletedCount}
-                  icon="✓"
-                  color="success"
-                  description="Completed"
-                />
+            {/* I'm Owed Money Card */}
+            <div className="analytics-card owed-summary-card">
+              <div className="card-header">
+                <h3 className="card-heading">I'm Owed Money</h3>
+                <div className="card-badge owed-badge">{iAmOwedEntries.length} entries</div>
+              </div>
+              <div className="summary-row">
+                <div className="summary-item">
+                  <span className="summary-label">Pending</span>
+                  <span className="summary-value pending-color">{iAmOwedPendingCount}</span>
+                  <span className="summary-amount">₨ {iAmOwedEntries.filter(e => e.status === 'pending').reduce((sum, e) => sum + e.amount, 0).toLocaleString('en-PK')}</span>
+                </div>
+                <div className="summary-divider"></div>
+                <div className="summary-item">
+                  <span className="summary-label">Received</span>
+                  <span className="summary-value success-color">{iAmOwedCompletedCount}</span>
+                </div>
               </div>
               <BreakdownChart
                 pendingCount={iAmOwedPendingCount}
                 completedCount={iAmOwedCompletedCount}
-                title="Status Breakdown"
               />
             </div>
-          </div>
-
-          {/* Summary Stats */}
-          <div className="summary-stats">
-            <StatsCard
-              title="Total Entries"
-              value={iOweEntries.length + iAmOwedEntries.length}
-              icon="📊"
-              color="info"
-              description="Across both categories"
-            />
-            <StatsCard
-              title="Pending Count"
-              value={iOwePendingCount + iAmOwedPendingCount}
-              icon="⚠️"
-              color="warning"
-              description="Awaiting action"
-            />
-            <StatsCard
-              title="Completed Count"
-              value={iOweCompletedCount + iAmOwedCompletedCount}
-              icon="✓"
-              color="success"
-              description="All settled"
-            />
           </div>
         </div>
 
