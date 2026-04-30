@@ -120,7 +120,13 @@ function Dashboard() {
             <p>Here's your financial summary</p>
           </div>
           <div className="user-avatar">
-            {user.name?.charAt(0).toUpperCase()}
+            <button
+              className="avatar-button"
+              onClick={() => navigate('/profile')}
+              title="View Profile"
+            >
+              {user.name?.charAt(0).toUpperCase()}
+            </button>
           </div>
         </div>
 

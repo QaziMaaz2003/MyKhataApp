@@ -47,11 +47,11 @@ export default function Login() {
       clearTimeout(errorTimeoutRef.current);
     }
     
-    // Set new timeout to clear error after 4 seconds
+    // Set new timeout to clear error after 5 seconds
     errorTimeoutRef.current = setTimeout(() => {
       setError('');
       errorTimeoutRef.current = null;
-    }, 4000);
+    }, 5000);
   };
 
   const handleLogin = async (e) => {
@@ -80,6 +80,10 @@ export default function Login() {
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
       showErrorMessage(errorMessage);
+      toast.error(errorMessage, {
+        duration: 5000,
+        icon: '❌',
+      });
       console.error('Login error:', error);
     } finally {
       setLoading(false);

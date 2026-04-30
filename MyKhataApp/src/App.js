@@ -7,6 +7,7 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import IOweMoneyPage from './pages/IOweMoneyPage';
 import IAmOwedMoneyPage from './pages/IAmOwedMoneyPage';
+import Profile from './pages/Profile';
 import './App.css';
 
 function App() {
@@ -40,6 +41,14 @@ function App() {
           element={
             <ProtectedRoute>
               <IAmOwedMoneyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
