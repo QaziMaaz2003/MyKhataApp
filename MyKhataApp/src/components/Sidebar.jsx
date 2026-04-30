@@ -12,8 +12,8 @@ function Sidebar({ isOpen, onClose, onLogout, user }) {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: FiHome },
-    { path: '/i-owe-money', label: 'I Owe Money', icon: FiArrowUp },
-    { path: '/i-am-owed-money', label: "I'm Owed Money", icon: FiArrowDown }
+    { path: '/i-owe-money', label: 'I need to pay', icon: FiArrowUp },
+    { path: '/i-am-owed-money', label: 'They need to pay', icon: FiArrowDown }
   ];
 
   return (
@@ -21,7 +21,7 @@ function Sidebar({ isOpen, onClose, onLogout, user }) {
       {/* Sidebar Header */}
       <div className="sidebar-header">
         <div className="app-logo">
-          <span className="logo-icon">💰</span>
+          <span className="logo-icon">₨</span>
           <span className="logo-text">MyKhata</span>
         </div>
         <button className="close-sidebar" onClick={onClose}>

@@ -127,9 +127,9 @@ function Dashboard() {
         {/* Stats Cards */}
         <div className="stats-container">
           <div className="stat-card owe-card">
-            <div className="stat-icon">📤</div>
+            <div className="stat-icon">₨</div>
             <div className="stat-content">
-              <p className="stat-label">Total I Owe</p>
+              <p className="stat-label">Total I need to pay</p>
               <h2 className="stat-amount">
                 {totalIOweMoney.toLocaleString('en-PK')} PKR
               </h2>
@@ -140,9 +140,9 @@ function Dashboard() {
           </div>
 
           <div className="stat-card owed-card">
-            <div className="stat-icon">📥</div>
+            <div className="stat-icon">₨</div>
             <div className="stat-content">
-              <p className="stat-label">Total I'm Owed</p>
+              <p className="stat-label">Total they owe</p>
               <h2 className="stat-amount">
                 {totalAmOwedMoney.toLocaleString('en-PK')} PKR
               </h2>
@@ -153,7 +153,7 @@ function Dashboard() {
           </div>
 
           <div className="stat-card net-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon">₨</div>
             <div className="stat-content">
               <p className="stat-label">Net Balance</p>
               <h2 className={`stat-amount ${totalAmOwedMoney - totalIOweMoney >= 0 ? 'positive' : 'negative'}`}>
@@ -168,10 +168,10 @@ function Dashboard() {
           <h2 className="section-title">Your Financial Summary</h2>
           
           <div className="analytics-grid">
-            {/* I Owe Money Card */}
+            {/* I need to pay Card */}
             <div className="analytics-card owe-summary-card">
               <div className="card-header">
-                <h3 className="card-heading">I Owe Money</h3>
+                <h3 className="card-heading">I need to pay</h3>
                 <div className="card-badge pending-badge">{iOweEntries.length} entries</div>
               </div>
               <div className="summary-row">
@@ -192,10 +192,10 @@ function Dashboard() {
               />
             </div>
 
-            {/* I'm Owed Money Card */}
+            {/* They need to pay Card */}
             <div className="analytics-card owed-summary-card">
               <div className="card-header">
-                <h3 className="card-heading">I'm Owed Money</h3>
+                <h3 className="card-heading">They need to pay</h3>
                 <div className="card-badge owed-badge">{iAmOwedEntries.length} entries</div>
               </div>
               <div className="summary-row">

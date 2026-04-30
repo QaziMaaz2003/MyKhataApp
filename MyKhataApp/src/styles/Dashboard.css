@@ -176,7 +176,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: linear-gradient(135deg, #7cc8f8 0%, #4ca3f8 100%);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -187,13 +187,15 @@
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
   transform: translateY(-2px);
+  background: linear-gradient(135deg, #6bb8e8 0%, #3b93e8 100%);
 }
 
 .stat-icon {
   font-size: 48px;
   margin-right: 20px;
+  color: white;
 }
 
 .stat-content {
@@ -203,7 +205,7 @@
 .stat-label {
   margin: 0;
   font-size: 14px;
-  color: #6c757d;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -213,20 +215,20 @@
   margin: 8px 0 0 0;
   font-size: 32px;
   font-weight: 700;
-  color: #212529;
+  color: white;
 }
 
 .stat-amount.positive {
-  color: #28a745;
+  color: #ef4444;
 }
 
 .stat-amount.negative {
-  color: #dc3545;
+  color: #ff6b6b;
 }
 
 .stat-link {
   font-size: 24px;
-  color: #667eea;
+  color: white;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-left: 12px;

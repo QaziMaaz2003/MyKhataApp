@@ -6,6 +6,7 @@ import { FiMenu, FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
 import Sidebar from '../components/Sidebar';
 import AddEditEntryForm from '../components/AddEditEntryForm';
 import ImageLightbox from '../components/ImageLightbox';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import '../styles/EntriesPage.css';
 
 function IAmOwedMoneyPage() {
@@ -21,6 +22,7 @@ function IAmOwedMoneyPage() {
   const [sortBy, setSortBy] = useState('none');
   const [sortOrder, setSortOrder] = useState('asc');
   const [appliedFilters, setAppliedFilters] = useState({ sortBy: 'none', sortOrder: 'asc' });
+  const [deleteConfirmation, setDeleteConfirmation] = useState({ isOpen: false, entryId: null });
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -47,7 +49,25 @@ function IAmOwedMoneyPage() {
   };
 
   const handleDeleteEntry = (id) => {
-    handleDelete(id);
+    setDeleteConfirmation({ isOpen: true, entryId: id });
+  };
+
+  const handleConfirmDelete = async () => {
+    const { entryId } = deleteConfirmation;
+    setDeleteConfirmation({ isOpen: false, entryId: null });
+
+    try {
+      await api.delete(`/entries/i-am-owed-money/${entryId}`);
+      toast.success('Entry deleted successfully');
+      fetchEntries();
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      toast.error('Failed to delete entry');
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ isOpen: false, entryId: null });
   };
 
   const handleEditEntry = (entry) => {
@@ -166,8 +186,8 @@ function IAmOwedMoneyPage() {
             <FiMenu size={24} />
           </button>
           <div>
-            <h1>I'm Owed Money</h1>
-            <p>Track the money others owe to you</p>
+            <h1>They need to pay</h1>
+            <p>Track the money they owe to you</p>
           </div>
         </div>
 
@@ -333,6 +353,18 @@ function IAmOwedMoneyPage() {
         imageUrl={lightboxImage}
         alt="Bill Image"
         onClose={closeLightbox}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirmation.isOpen}
+        title="Delete Entry"
+        message="Are you sure you want to delete this entry? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
       />
     </div>
   );
