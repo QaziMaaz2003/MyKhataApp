@@ -132,7 +132,8 @@ function Profile() {
       errors.push('Must contain at least one number (0-9)');
     }
     
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(passwordForm.newPassword)) {
+    // eslint-disable-next-line no-useless-escape
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(passwordForm.newPassword)) {
       errors.push('Must contain at least one special character (!@#$%^&*...)');
     }
     

@@ -19,7 +19,7 @@ function CameraCapture({ isOpen, onClose, onCapture, isCapturing }) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [isOpen]);
+  }, [isOpen, isCameraActive, stream]);
 
   const startCamera = async () => {
     try {

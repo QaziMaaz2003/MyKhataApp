@@ -57,7 +57,8 @@ export default function Signup() {
       errors.push('Must contain at least one number (0-9)');
     }
     
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    // eslint-disable-next-line no-useless-escape
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password)) {
       errors.push('Must contain at least one special character (!@#$%^&*...)');
     }
     

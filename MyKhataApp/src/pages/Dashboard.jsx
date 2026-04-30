@@ -4,7 +4,6 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { FiArrowRight, FiMenu } from 'react-icons/fi';
 import Sidebar from '../components/Sidebar';
-import StatsCard from '../components/StatsCard';
 import BreakdownChart from '../components/BreakdownChart';
 import '../styles/Dashboard.css';
 

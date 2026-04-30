@@ -84,6 +84,7 @@ function IAmOwedMoneyPage() {
     fetchEntries();
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this entry?')) {
       try {
