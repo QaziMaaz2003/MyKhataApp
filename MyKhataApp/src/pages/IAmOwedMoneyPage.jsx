@@ -9,6 +9,68 @@ import ImageLightbox from '../components/ImageLightbox';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import '../styles/EntriesPage.css';
 
+function PaymentForm({ onSubmit, onCancel }) {
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [description, setDescription] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!amount || parseFloat(amount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    onSubmit(amount, date, description);
+    setAmount('');
+    setDescription('');
+  };
+
+  return (
+    <div className="payment-form">
+      <h4>Record Payment</h4>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Amount (PKR)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="0"
+            step="0.01"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Description (optional)</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="e.g., Partial payment"
+          />
+        </div>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-sm btn-primary">
+            Record Payment
+          </button>
+          <button type="button" className="btn btn-sm btn-secondary" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function IAmOwedMoneyPage() {
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
@@ -23,6 +85,8 @@ function IAmOwedMoneyPage() {
   const [sortOrder, setSortOrder] = useState('asc');
   const [appliedFilters, setAppliedFilters] = useState({ sortBy: 'none', sortOrder: 'asc' });
   const [deleteConfirmation, setDeleteConfirmation] = useState({ isOpen: false, entryId: null });
+  const [expandedPayments, setExpandedPayments] = useState({});
+  const [showPaymentForm, setShowPaymentForm] = useState(null);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -35,10 +99,10 @@ function IAmOwedMoneyPage() {
       const response = await api.get('/entries/i-am-owed-money');
       const entriesData = response.data.data.entries || [];
       setEntries(entriesData);
-      // Only count pending entries in total
+      // Calculate total from remaining amounts (not original amounts)
       const total = entriesData
         .filter(entry => entry.status === 'pending')
-        .reduce((sum, entry) => sum + entry.amount, 0);
+        .reduce((sum, entry) => sum + (entry.remaining || entry.amount), 0);
       setTotalAmount(total);
     } catch (error) {
       console.error('Error fetching entries:', error);
@@ -82,6 +146,29 @@ function IAmOwedMoneyPage() {
 
   const handleModalSave = () => {
     fetchEntries();
+  };
+
+  const togglePaymentHistory = (entryId) => {
+    setExpandedPayments((prev) => ({
+      ...prev,
+      [entryId]: !prev[entryId],
+    }));
+  };
+
+  const handleRecordPayment = async (entryId, amount, date, description) => {
+    try {
+      await api.post(`/entries/i-am-owed-money/${entryId}`, {
+        amount: parseFloat(amount),
+        date: date ? new Date(date).toISOString() : new Date().toISOString(),
+        description,
+      });
+      toast.success('Payment recorded successfully');
+      setShowPaymentForm(null);
+      fetchEntries();
+    } catch (error) {
+      console.error('Error recording payment:', error);
+      toast.error('Failed to record payment');
+    }
   };
 
   // eslint-disable-next-line no-unused-vars
@@ -261,11 +348,27 @@ function IAmOwedMoneyPage() {
 
                   <div className="entry-details">
                     <div className="detail-row">
-                      <span className="label">Amount:</span>
+                      <span className="label">Original Amount:</span>
                       <span className="value amount">
                         {entry.amount.toLocaleString('en-PK')} PKR
                       </span>
                     </div>
+                    {entry.totalPaid > 0 && (
+                      <div className="detail-row">
+                        <span className="label">Paid So Far:</span>
+                        <span className="value paid">
+                          {entry.totalPaid.toLocaleString('en-PK')} PKR
+                        </span>
+                      </div>
+                    )}
+                    {entry.remaining && entry.remaining > 0 && (
+                      <div className="detail-row">
+                        <span className="label">Remaining:</span>
+                        <span className="value remaining">
+                          {entry.remaining.toLocaleString('en-PK')} PKR
+                        </span>
+                      </div>
+                    )}
                     <div className="detail-row">
                       <span className="label">Date:</span>
                       <span className="value">{formatDate(entry.date)}</span>
@@ -288,6 +391,31 @@ function IAmOwedMoneyPage() {
                         <span className="value">{entry.description}</span>
                       </div>
                     )}
+                    
+                    {/* Payment History Section */}
+                    {entry.payments && entry.payments.length > 0 && (
+                      <div className="payment-history-section">
+                        <button
+                          className="payment-history-toggle"
+                          onClick={() => togglePaymentHistory(entry.id)}
+                        >
+                          <span>{expandedPayments[entry.id] ? '▼' : '▶'} Payment History ({entry.payments.length})</span>
+                        </button>
+                        {expandedPayments[entry.id] && (
+                          <div className="payment-history-list">
+                            {entry.payments.map((payment, index) => (
+                              <div key={index} className="payment-item">
+                                <span className="payment-date">{formatDate(payment.date)}</span>
+                                <span className="payment-amount">{payment.amount.toLocaleString('en-PK')} PKR</span>
+                                {payment.description && (
+                                  <span className="payment-desc">{payment.description}</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {entry.billImageUrl && (
@@ -300,6 +428,10 @@ function IAmOwedMoneyPage() {
                   )}
 
                   <div className="entry-actions">
+                    <button className="btn btn-sm btn-payment" onClick={() => setShowPaymentForm(entry.id)}>
+                      <FiPlus size={16} />
+                      Record Payment
+                    </button>
                     <button className="btn btn-sm btn-edit" onClick={() => handleEditEntry(entry)}>
                       <FiEdit2 size={16} />
                       Edit
@@ -312,6 +444,14 @@ function IAmOwedMoneyPage() {
                       Delete
                     </button>
                   </div>
+
+                  {/* Payment Form */}
+                  {showPaymentForm === entry.id && (
+                    <PaymentForm
+                      onSubmit={(amount, date, desc) => handleRecordPayment(entry.id, amount, date, desc)}
+                      onCancel={() => setShowPaymentForm(null)}
+                    />
+                  )}
                 </div>
               ))}
             </div>
