@@ -22,10 +22,64 @@ export default function Signup() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    // For phone field, only allow digits
+    if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      setFormData(prev => ({
+        ...prev,
+        [name]: digitsOnly,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const validatePasswordStrength = (password) => {
+    const errors = [];
+    
+    if (password.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Must contain at least one uppercase letter (A-Z)');
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      errors.push('Must contain at least one lowercase letter (a-z)');
+    }
+    
+    if (!/\d/.test(password)) {
+      errors.push('Must contain at least one number (0-9)');
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors.push('Must contain at least one special character (!@#$%^&*...)');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
+  };
+
+  const validatePhoneNumber = (phone) => {
+    if (!phone) return { isValid: true }; // Phone is optional
+    
+    const digitsOnly = phone.replace(/\D/g, '');
+    
+    if (digitsOnly.length !== 11) {
+      return {
+        isValid: false,
+        error: 'Phone number must be exactly 11 digits'
+      };
+    }
+    
+    return { isValid: true };
   };
 
   const handleDateChange = (date) => {
@@ -53,14 +107,28 @@ export default function Signup() {
       toast.error('Password is required');
       return false;
     }
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(formData.password);
+    if (!passwordValidation.isValid) {
+      passwordValidation.errors.forEach(error => toast.error(error));
       return false;
     }
+    
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return false;
     }
+    
+    // Validate phone number
+    if (formData.phone) {
+      const phoneValidation = validatePhoneNumber(formData.phone);
+      if (!phoneValidation.isValid) {
+        toast.error(phoneValidation.error);
+        return false;
+      }
+    }
+    
     if (!formData.gender) {
       toast.error('Please select a gender');
       return false;
@@ -90,18 +158,16 @@ export default function Signup() {
         phone: formData.phone,
       });
 
-      const { token, user } = response.data.data;
-
-      // Store token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      toast.success('Account created successfully!');
-      navigate('/dashboard');
+      if (response.data.success) {
+        const { user, token } = response.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        toast.success('Account created successfully!');
+        navigate('/dashboard');
+      }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Signup failed';
       toast.error(errorMessage);
-      console.error('Signup error:', error);
     } finally {
       setLoading(false);
     }
@@ -181,27 +247,29 @@ export default function Signup() {
 
           {/* Phone (Optional) */}
           <div className="form-group">
-            <label htmlFor="phone">Phone (Optional)</label>
+            <label htmlFor="phone">Phone (Optional - 11 digits)</label>
             <input
               type="tel"
               id="phone"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              placeholder="03001234567"
+              placeholder="01234567890 (11 digits)"
+              maxLength="11"
+              inputMode="numeric"
             />
           </div>
 
           {/* Password */}
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Password (Min 8 chars, uppercase, lowercase, number, special char)</label>
             <input
               type="password"
               id="password"
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              placeholder="Minimum 6 characters"
+              placeholder="Enter strong password"
             />
           </div>
 

@@ -113,8 +113,31 @@ function Profile() {
       return;
     }
 
-    if (passwordForm.newPassword.length < 6) {
-      toast.error('New password must be at least 6 characters');
+    // Validate password strength
+    const errors = [];
+    
+    if (passwordForm.newPassword.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    if (!/[A-Z]/.test(passwordForm.newPassword)) {
+      errors.push('Must contain at least one uppercase letter (A-Z)');
+    }
+    
+    if (!/[a-z]/.test(passwordForm.newPassword)) {
+      errors.push('Must contain at least one lowercase letter (a-z)');
+    }
+    
+    if (!/\d/.test(passwordForm.newPassword)) {
+      errors.push('Must contain at least one number (0-9)');
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(passwordForm.newPassword)) {
+      errors.push('Must contain at least one special character (!@#$%^&*...)');
+    }
+    
+    if (errors.length > 0) {
+      errors.forEach(error => toast.error(error));
       return;
     }
 

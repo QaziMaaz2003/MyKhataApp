@@ -8,7 +8,6 @@ export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const errorTimeoutRef = React.useRef(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -20,7 +19,7 @@ export default function Login() {
       ...prev,
       [name]: value,
     }));
-    setError(''); // Clear error when user starts typing
+    setError('');
   };
 
   const validateForm = () => {
@@ -39,21 +38,6 @@ export default function Login() {
     return true;
   };
 
-  const showErrorMessage = (message) => {
-    setError(message);
-    
-    // Clear any existing timeout
-    if (errorTimeoutRef.current) {
-      clearTimeout(errorTimeoutRef.current);
-    }
-    
-    // Set new timeout to clear error after 5 seconds
-    errorTimeoutRef.current = setTimeout(() => {
-      setError('');
-      errorTimeoutRef.current = null;
-    }, 5000);
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -69,35 +53,21 @@ export default function Login() {
         password: formData.password,
       });
 
-      const { token, user } = response.data.data;
-
-      // Store token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      toast.success('Login successful!');
-      navigate('/dashboard');
+      if (response.data.success) {
+        const { user, token } = response.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        toast.success('Login successful!');
+        navigate('/dashboard');
+      }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
-      showErrorMessage(errorMessage);
-      toast.error(errorMessage, {
-        duration: 5000,
-        icon: '❌',
-      });
-      console.error('Login error:', error);
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  React.useEffect(() => {
-    return () => {
-      // Cleanup timeout on component unmount
-      if (errorTimeoutRef.current) {
-        clearTimeout(errorTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="auth-container">

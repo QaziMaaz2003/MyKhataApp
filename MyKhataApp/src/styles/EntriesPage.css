@@ -549,7 +549,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7cc8f8 0%, #4ca3f8 100%);
+  background-color: #7cc8f8;
   color: white;
   border: none;
   display: flex;
@@ -557,12 +557,13 @@
   justify-content: center;
   cursor: pointer;
   font-size: 24px;
-  box-shadow: 0 4px 12px rgba(76, 163, 248, 0.4);
+  box-shadow: 0 4px 12px rgba(124, 200, 248, 0.4);
   transition: all 0.3s ease;
   z-index: 100;
 }
 
 .fab-button:hover {
+  background-color: #4ca3f8;
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(76, 163, 248, 0.6);
 }
