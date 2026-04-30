@@ -133,7 +133,7 @@ function Dashboard() {
           <div className="stat-card owe-card">
             <div className="stat-icon">₨</div>
             <div className="stat-content">
-              <p className="stat-label">Total Supplier</p>
+              <p className="stat-label">Supplier Amount</p>
               <h2 className="stat-amount">
                 {totalIOweMoney.toLocaleString('en-PK')} PKR
               </h2>
@@ -146,7 +146,7 @@ function Dashboard() {
           <div className="stat-card owed-card">
             <div className="stat-icon">₨</div>
             <div className="stat-content">
-              <p className="stat-label">Total they owe</p>
+              <p className="stat-label">Customer Amount</p>
               <h2 className="stat-amount">
                 {totalAmOwedMoney.toLocaleString('en-PK')} PKR
               </h2>
