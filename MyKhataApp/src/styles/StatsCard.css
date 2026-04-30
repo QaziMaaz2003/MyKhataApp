@@ -1,0 +1,137 @@
+/* Stats Card Component */
+.stats-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #667eea;
+  cursor: default;
+}
+
+.stats-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.stats-card.stats-card-primary {
+  border-left-color: #667eea;
+}
+
+.stats-card.stats-card-pending {
+  border-left-color: #ffc107;
+}
+
+.stats-card.stats-card-success {
+  border-left-color: #28a745;
+}
+
+.stats-card.stats-card-warning {
+  border-left-color: #fd7e14;
+}
+
+.stats-card.stats-card-info {
+  border-left-color: #17a2b8;
+}
+
+.card-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 12px;
+  color: #6c757d;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  margin: 6px 0 0 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.card-description {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.card-trend {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.card-trend.up {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.card-trend.down {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .stats-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .card-icon {
+    font-size: 28px;
+  }
+
+  .card-title {
+    font-size: 11px;
+  }
+
+  .card-value {
+    font-size: 20px;
+  }
+
+  .card-description {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-card {
+    padding: 10px;
+    gap: 8px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .card-icon {
+    font-size: 24px;
+  }
+
+  .card-title {
+    font-size: 10px;
+  }
+
+  .card-value {
+    font-size: 18px;
+  }
+
+  .card-trend {
+    width: 100%;
+    text-align: center;
+  }
+}

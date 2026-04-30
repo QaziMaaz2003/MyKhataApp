@@ -1,0 +1,149 @@
+/* Breakdown Chart Component */
+.breakdown-chart {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  margin-top: 0;
+}
+
+.chart-title {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chart-bar {
+  display: flex;
+  height: 28px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #e9ecef;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.bar-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bar-segment.pending {
+  background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+}
+
+.bar-segment.completed {
+  background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.bar-segment:hover {
+  filter: brightness(1.08);
+}
+
+.bar-label {
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* Chart Legend */
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.pending {
+  background-color: #ffc107;
+}
+
+.legend-dot.completed {
+  background-color: #28a745;
+}
+
+.legend-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .breakdown-chart {
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .chart-bar {
+    height: 24px;
+    margin-bottom: 10px;
+  }
+
+  .bar-label {
+    font-size: 10px;
+  }
+
+  .chart-legend {
+    gap: 16px;
+  }
+
+  .legend-label {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breakdown-chart {
+    padding: 0;
+  }
+
+  .chart-title {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  .chart-bar {
+    height: 20px;
+    margin-bottom: 8px;
+  }
+
+  .bar-label {
+    font-size: 9px;
+  }
+
+  .chart-legend {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .legend-label {
+    font-size: 11px;
+  }
+}

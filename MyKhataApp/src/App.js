@@ -1,15 +1,60 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Home from './pages/Home';
-import './styles/App.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import IOweMoneyPage from './pages/IOweMoneyPage';
+import IAmOwedMoneyPage from './pages/IAmOwedMoneyPage';
+import Profile from './pages/Profile';
+import './App.css';
 
 function App() {
   return (
     <Router>
-      <Header />
+      <Toaster position="top-right" />
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Auth Routes */}
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/signup" element={<Signup />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/i-owe-money"
+          element={
+            <ProtectedRoute>
+              <IOweMoneyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/i-am-owed-money"
+          element={
+            <ProtectedRoute>
+              <IAmOwedMoneyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

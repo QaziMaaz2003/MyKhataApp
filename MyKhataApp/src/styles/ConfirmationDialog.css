@@ -1,0 +1,141 @@
+/* Confirmation Dialog */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.confirmation-dialog {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 90%;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirmation-header {
+  padding: 24px 24px 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.confirmation-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.confirmation-body {
+  padding: 16px 24px;
+}
+
+.confirmation-body p {
+  margin: 0;
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e9ecef;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-confirm {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.btn-cancel {
+  background-color: #e9ecef;
+  color: #212529;
+  border: 1px solid #dee2e6;
+}
+
+.btn-cancel:hover {
+  background-color: #dee2e6;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #7cc8f8 0%, #4ca3f8 100%);
+  color: white;
+  border: none;
+}
+
+.btn-confirm:hover {
+  box-shadow: 0 4px 12px rgba(124, 200, 248, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-confirm.btn-danger {
+  background: #ef4444;
+  border: none;
+}
+
+.btn-confirm.btn-danger:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .confirmation-dialog {
+    width: 95%;
+  }
+
+  .confirmation-header {
+    padding: 16px 16px 8px;
+  }
+
+  .confirmation-header h2 {
+    font-size: 18px;
+  }
+
+  .confirmation-body {
+    padding: 12px 16px;
+  }
+
+  .confirmation-body p {
+    font-size: 13px;
+  }
+
+  .confirmation-actions {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-cancel,
+  .btn-confirm {
+    flex: 1;
+  }
+}
