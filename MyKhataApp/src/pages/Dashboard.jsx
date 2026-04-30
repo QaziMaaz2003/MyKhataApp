@@ -104,7 +104,8 @@ function Dashboard() {
         user={user}
       />
 
-      {/* Main Content */}\n      <main className={`dashboard-main ${sidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Main Content */}
+      <main className={`dashboard-main ${sidebarOpen ? 'sidebar-open' : ''}`}>
         {/* Header */}
         <div className="dashboard-header">
           <button
