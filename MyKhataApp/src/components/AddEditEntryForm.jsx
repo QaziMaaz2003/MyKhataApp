@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { FiX, FiUpload } from 'react-icons/fi';
+import { FiX, FiUpload, FiCamera } from 'react-icons/fi';
+import CameraCapture from './CameraCapture';
 import '../styles/Modal.css';
 import 'react-calendar/dist/Calendar.css';
 
@@ -24,6 +25,7 @@ function AddEditEntryForm({ isOpen, onClose, entryType, onSave, editingEntry }) 
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [showCameraModal, setShowCameraModal] = useState(false);
 
   useEffect(() => {
     if (editingEntry) {
@@ -95,6 +97,16 @@ function AddEditEntryForm({ isOpen, onClose, entryType, onSave, editingEntry }) 
       return;
     }
 
+    await processImageFile(file);
+  };
+
+  const handleCameraCapture = async (blob) => {
+    // Convert blob to file
+    const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+    await processImageFile(file);
+  };
+
+  const processImageFile = async (file) => {
     // Preview image
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -406,17 +418,28 @@ function AddEditEntryForm({ isOpen, onClose, entryType, onSave, editingEntry }) 
           {/* Image Upload */}
           <div className="form-group">
             <label>Bill Image (Optional)</label>
-            <div 
+            <div
               className={`image-upload-wrapper ${dragActive ? 'drag-active' : ''}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
             >
-              <label htmlFor="billImage" className="file-input-label">
-                <FiUpload size={20} />
-                {uploading ? 'Uploading...' : 'Upload Image'}
-              </label>
+              <div className="image-button-group">
+                <label htmlFor="billImage" className="file-input-label upload-btn">
+                  <FiUpload size={20} />
+                  {uploading ? 'Uploading...' : 'Upload Image'}
+                </label>
+                <button
+                  type="button"
+                  className="file-input-label camera-btn"
+                  onClick={() => setShowCameraModal(true)}
+                  disabled={uploading}
+                >
+                  <FiCamera size={20} />
+                  Capture Image
+                </button>
+              </div>
               <input
                 type="file"
                 id="billImage"
@@ -459,6 +482,13 @@ function AddEditEntryForm({ isOpen, onClose, entryType, onSave, editingEntry }) 
             </button>
           </div>
         </form>
+
+        <CameraCapture
+          isOpen={showCameraModal}
+          onClose={() => setShowCameraModal(false)}
+          onCapture={handleCameraCapture}
+          isCapturing={uploading}
+        />
       </div>
     </div>
   );

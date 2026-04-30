@@ -202,6 +202,7 @@
 /* Image Upload */
 .image-upload-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
   padding: 12px;
@@ -213,6 +214,12 @@
 .image-upload-wrapper.drag-active {
   border-color: #667eea;
   background-color: #f8f9ff;
+}
+
+.image-button-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
 }
 
 .file-input-label {
@@ -230,16 +237,39 @@
   color: #667eea;
   transition: all 0.3s ease;
   white-space: nowrap;
+  font-size: 14px;
+  font-family: inherit;
+  background: none;
+}
+
+.file-input-label.upload-btn {
+  background: linear-gradient(135deg, rgba(124, 200, 248, 0.1) 0%, rgba(76, 163, 248, 0.1) 100%);
+  border: 2px dashed #7cc8f8;
+  color: #4ca3f8;
+}
+
+.file-input-label.upload-btn:hover {
+  background-color: rgba(124, 200, 248, 0.15);
+  border-color: #4ca3f8;
+  color: #4ca3f8;
+  box-shadow: 0 0 0 3px rgba(124, 200, 248, 0.1);
+}
+
+.file-input-label.camera-btn {
+  background: linear-gradient(135deg, rgba(76, 163, 248, 0.1) 0%, rgba(60, 100, 200, 0.1) 100%);
+  border: 2px dashed #4ca3f8;
+  color: #3c64c8;
+}
+
+.file-input-label.camera-btn:hover:not(:disabled) {
+  background-color: rgba(76, 163, 248, 0.15);
+  border-color: #3c64c8;
+  color: #3c64c8;
+  box-shadow: 0 0 0 3px rgba(76, 163, 248, 0.1);
 }
 
 .file-input-label::after {
   content: '';
-}
-
-.file-input-label:hover {
-  background-color: #f0f0ff;
-  border-color: #764ba2;
-  color: #764ba2;
 }
 
 .file-input-label:disabled {
