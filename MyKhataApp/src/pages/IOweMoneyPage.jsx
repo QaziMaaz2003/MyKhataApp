@@ -38,7 +38,7 @@ function PaymentForm({ onSubmit, onCancel, isOwedMoney = false }) {
               {isOwedMoney ? 'Money Received' : 'Money Paid'}
             </option>
             <option value="additional_debt">
-              {isOwedMoney ? 'Additional Money Owed to Me' : 'Additional Money Owed'}
+              {isOwedMoney ? 'Give product' : 'Take product'}
             </option>
           </select>
         </div>
@@ -278,7 +278,7 @@ function IOweMoneyPage() {
       />
 
       {/* Main Content */}
-      <main className="page-main">
+      <main className={`page-main ${sidebarOpen ? 'sidebar-open' : ''}`}>
         {/* Header */}
         <div className="page-header">
           <button

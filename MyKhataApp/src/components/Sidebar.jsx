@@ -17,9 +17,14 @@ function Sidebar({ isOpen, onClose, onLogout, user }) {
   ];
 
   return (
-    <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
-      {/* Sidebar Header */}
-      <div className="sidebar-header">
+    <>
+      {/* Backdrop Overlay */}
+      {isOpen && (
+        <div className="sidebar-backdrop" onClick={onClose}></div>
+      )}
+      <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
         <div className="app-logo">
           <span className="logo-icon">₨</span>
           <span className="logo-text">MyKhata</span>
@@ -69,6 +74,7 @@ function Sidebar({ isOpen, onClose, onLogout, user }) {
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

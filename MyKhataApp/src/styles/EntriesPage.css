@@ -753,15 +753,26 @@
 
   .sidebar {
     width: 100%;
-    height: auto;
+    height: 100vh;
     position: fixed;
     transform: translateX(-100%);
-    border-radius: 0 0 12px 12px;
-    max-height: 70vh;
+    border-radius: 0;
+    max-height: none;
+    z-index: 1001;
   }
 
   .sidebar.open {
     transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
   }
 
   .close-sidebar {
@@ -771,6 +782,12 @@
   .page-main {
     margin-left: 0;
     padding-top: 0;
+    transition: filter 0.3s ease;
+  }
+
+  .page-main.sidebar-open {
+    filter: blur(5px);
+    pointer-events: none;
   }
 
   .page-header {
