@@ -9,8 +9,9 @@ import ImageLightbox from '../components/ImageLightbox';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import '../styles/EntriesPage.css';
 
-function PaymentForm({ onSubmit, onCancel }) {
+function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
   const [amount, setAmount] = useState('');
+  const [type, setType] = useState('payment');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
 
@@ -20,15 +21,27 @@ function PaymentForm({ onSubmit, onCancel }) {
       toast.error('Please enter a valid amount');
       return;
     }
-    onSubmit(amount, date, description);
+    onSubmit(amount, date, description, type);
     setAmount('');
     setDescription('');
+    setType('payment');
   };
 
   return (
     <div className="payment-form">
-      <h4>Record Payment</h4>
+      <h4>{type === 'payment' ? 'Record Payment' : 'Add Transaction'}</h4>
       <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Transaction Type</label>
+          <select value={type} onChange={(e) => setType(e.target.value)}>
+            <option value="payment">
+              {isOwedMoney ? 'Money Received' : 'Money Paid'}
+            </option>
+            <option value="additional_debt">
+              {isOwedMoney ? 'Give product' : 'Take product'}
+            </option>
+          </select>
+        </div>
         <div className="form-group">
           <label>Amount (PKR)</label>
           <input
@@ -60,7 +73,7 @@ function PaymentForm({ onSubmit, onCancel }) {
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-sm btn-primary">
-            Record Payment
+            Record
           </button>
           <button type="button" className="btn btn-sm btn-secondary" onClick={onCancel}>
             Cancel
@@ -155,19 +168,20 @@ function IAmOwedMoneyPage() {
     }));
   };
 
-  const handleRecordPayment = async (entryId, amount, date, description) => {
+  const handleRecordPayment = async (entryId, amount, date, description, type) => {
     try {
       await api.post(`/entries/i-am-owed-money/${entryId}`, {
         amount: parseFloat(amount),
         date: date ? new Date(date).toISOString() : new Date().toISOString(),
         description,
+        type,
       });
-      toast.success('Payment recorded successfully');
+      toast.success('Transaction recorded successfully');
       setShowPaymentForm(null);
       fetchEntries();
     } catch (error) {
-      console.error('Error recording payment:', error);
-      toast.error('Failed to record payment');
+      console.error('Error recording transaction:', error);
+      toast.error('Failed to record transaction');
     }
   };
 
@@ -264,7 +278,7 @@ function IAmOwedMoneyPage() {
       />
 
       {/* Main Content */}
-      <main className="page-main">
+      <main className={`page-main ${sidebarOpen ? 'sidebar-open' : ''}`}>
         {/* Header */}
         <div className="page-header">
           <button
@@ -274,7 +288,7 @@ function IAmOwedMoneyPage() {
             <FiMenu size={24} />
           </button>
           <div>
-            <h1>They need to pay</h1>
+            <h1>Customer</h1>
             <p>Track the money they owe to you</p>
           </div>
         </div>
@@ -399,14 +413,19 @@ function IAmOwedMoneyPage() {
                           className="payment-history-toggle"
                           onClick={() => togglePaymentHistory(entry.id)}
                         >
-                          <span>{expandedPayments[entry.id] ? '▼' : '▶'} Payment History ({entry.payments.length})</span>
+                          <span>{expandedPayments[entry.id] ? '▼' : '▶'} Transaction History ({entry.payments.length})</span>
                         </button>
                         {expandedPayments[entry.id] && (
                           <div className="payment-history-list">
                             {entry.payments.map((payment, index) => (
-                              <div key={index} className="payment-item">
+                              <div key={index} className={`payment-item ${payment.type}`}>
                                 <span className="payment-date">{formatDate(payment.date)}</span>
-                                <span className="payment-amount">{payment.amount.toLocaleString('en-PK')} PKR</span>
+                                <span className={`payment-amount ${payment.type}`}>
+                                  {payment.type === 'payment' ? '-' : '+'}{payment.amount.toLocaleString('en-PK')} PKR
+                                </span>
+                                <span className="payment-type">
+                                  {payment.type === 'payment' ? '(Received)' : '(Additional)'}
+                                </span>
                                 {payment.description && (
                                   <span className="payment-desc">{payment.description}</span>
                                 )}
@@ -448,7 +467,8 @@ function IAmOwedMoneyPage() {
                   {/* Payment Form */}
                   {showPaymentForm === entry.id && (
                     <PaymentForm
-                      onSubmit={(amount, date, desc) => handleRecordPayment(entry.id, amount, date, desc)}
+                      isOwedMoney={true}
+                      onSubmit={(amount, date, desc, type) => handleRecordPayment(entry.id, amount, date, desc, type)}
                       onCancel={() => setShowPaymentForm(null)}
                     />
                   )}

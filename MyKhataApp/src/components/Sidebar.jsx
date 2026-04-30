@@ -12,14 +12,19 @@ function Sidebar({ isOpen, onClose, onLogout, user }) {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: FiHome },
-    { path: '/i-owe-money', label: 'I need to pay', icon: FiArrowUp },
-    { path: '/i-am-owed-money', label: 'They need to pay', icon: FiArrowDown }
+    { path: '/i-owe-money', label: 'Supplier', icon: FiArrowUp },
+    { path: '/i-am-owed-money', label: 'Customer', icon: FiArrowDown }
   ];
 
   return (
-    <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
-      {/* Sidebar Header */}
-      <div className="sidebar-header">
+    <>
+      {/* Backdrop Overlay */}
+      {isOpen && (
+        <div className="sidebar-backdrop" onClick={onClose}></div>
+      )}
+      <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
         <div className="app-logo">
           <span className="logo-icon">₨</span>
           <span className="logo-text">MyKhata</span>
@@ -69,6 +74,7 @@ function Sidebar({ isOpen, onClose, onLogout, user }) {
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

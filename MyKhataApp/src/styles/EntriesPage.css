@@ -614,7 +614,18 @@
   transition: border-color 0.3s;
 }
 
-.form-group input:focus {
+.form-group select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #4ca3f8;
   box-shadow: 0 0 0 2px rgba(76, 163, 248, 0.1);
@@ -702,6 +713,22 @@
   min-width: 100px;
 }
 
+/* Transaction Type Styling */
+.payment-item.payment .payment-amount {
+  color: #2e7d32; /* Green for payments received/paid */
+}
+
+.payment-item.additional_debt .payment-amount {
+  color: #d32f2f; /* Red for additional debt */
+}
+
+.payment-type {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
 .payment-desc {
   font-size: 12px;
   color: #999;
@@ -726,15 +753,26 @@
 
   .sidebar {
     width: 100%;
-    height: auto;
+    height: 100vh;
     position: fixed;
     transform: translateX(-100%);
-    border-radius: 0 0 12px 12px;
-    max-height: 70vh;
+    border-radius: 0;
+    max-height: none;
+    z-index: 1001;
   }
 
   .sidebar.open {
     transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
   }
 
   .close-sidebar {
@@ -744,6 +782,12 @@
   .page-main {
     margin-left: 0;
     padding-top: 0;
+    transition: filter 0.3s ease;
+  }
+
+  .page-main.sidebar-open {
+    filter: blur(5px);
+    pointer-events: none;
   }
 
   .page-header {
