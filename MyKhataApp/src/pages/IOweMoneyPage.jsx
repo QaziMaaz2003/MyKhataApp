@@ -291,7 +291,7 @@ function IOweMoneyPage() {
   const getSortedEntries = () => {
     let sorted = entries
       .filter((entry) =>
-        entry.personName.toLowerCase().includes(searchTerm.toLowerCase())
+        entry.personName.trim().toLowerCase().includes(searchTerm.trim().toLowerCase())
       );
 
     if (appliedFilters.sortBy !== 'none' && sorted.length > 0) {
