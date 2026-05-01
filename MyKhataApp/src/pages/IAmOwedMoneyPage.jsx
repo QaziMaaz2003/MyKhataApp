@@ -7,6 +7,8 @@ import Sidebar from '../components/Sidebar';
 import AddEditEntryForm from '../components/AddEditEntryForm';
 import ImageLightbox from '../components/ImageLightbox';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import TransactionDetailModal from '../components/TransactionDetailModal';
+import CameraCapture from '../components/CameraCapture';
 import '../styles/EntriesPage.css';
 
 function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
@@ -14,6 +16,37 @@ function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
   const [type, setType] = useState('payment');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+
+  const processFile = async (file) => {
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (res.data.success) { setImageUrl(res.data.data.url); toast.success('Image uploaded'); }
+    } catch { toast.error('Failed to upload image'); setImagePreview(''); }
+    finally { setUploading(false); }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please upload an image file'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be less than 5MB'); return; }
+    await processFile(file);
+  };
+
+  const handleCameraCapture = async (blob) => {
+    const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+    await processFile(file);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,10 +54,12 @@ function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
       toast.error('Please enter a valid amount');
       return;
     }
-    onSubmit(amount, date, description, type);
+    onSubmit(amount, date, description, type, imageUrl);
     setAmount('');
     setDescription('');
     setType('payment');
+    setImageUrl('');
+    setImagePreview('');
   };
 
   return (
@@ -71,8 +106,27 @@ function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
             placeholder="e.g., Partial payment"
           />
         </div>
+        <div className="form-group">
+          <label>Image (optional)</label>
+          {imagePreview ? (
+            <div className="payment-image-preview">
+              <img src={imagePreview} alt="Preview" />
+              <button type="button" onClick={() => { setImageUrl(''); setImagePreview(''); }} className="remove-image-btn">✕ Remove</button>
+            </div>
+          ) : (
+            <div className="payment-upload-options">
+              <label htmlFor={`paymentImg-owed-${isOwedMoney}`} className="payment-upload-label">
+                {uploading ? 'Uploading...' : '📁 Upload'}
+                <input id={`paymentImg-owed-${isOwedMoney}`} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} disabled={uploading} />
+              </label>
+              <button type="button" className="payment-upload-label" onClick={() => setShowCamera(true)} disabled={uploading}>
+                📷 Capture
+              </button>
+            </div>
+          )}
+        </div>
         <div className="form-actions">
-          <button type="submit" className="btn btn-sm btn-primary">
+          <button type="submit" className="btn btn-sm btn-primary" disabled={uploading}>
             Record
           </button>
           <button type="button" className="btn btn-sm btn-secondary" onClick={onCancel}>
@@ -80,6 +134,12 @@ function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
           </button>
         </div>
       </form>
+      <CameraCapture
+        isOpen={showCamera}
+        onClose={() => setShowCamera(false)}
+        onCapture={handleCameraCapture}
+        isCapturing={uploading}
+      />
     </div>
   );
 }
@@ -100,6 +160,7 @@ function IAmOwedMoneyPage() {
   const [deleteConfirmation, setDeleteConfirmation] = useState({ isOpen: false, entryId: null });
   const [expandedPayments, setExpandedPayments] = useState({});
   const [showPaymentForm, setShowPaymentForm] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -168,13 +229,14 @@ function IAmOwedMoneyPage() {
     }));
   };
 
-  const handleRecordPayment = async (entryId, amount, date, description, type) => {
+  const handleRecordPayment = async (entryId, amount, date, description, type, imageUrl) => {
     try {
       await api.post(`/entries/i-am-owed-money/${entryId}`, {
         amount: parseFloat(amount),
         date: date ? new Date(date).toISOString() : new Date().toISOString(),
         description,
         type,
+        ...(imageUrl && { imageUrl }),
       });
       toast.success('Transaction recorded successfully');
       setShowPaymentForm(null);
@@ -229,7 +291,7 @@ function IAmOwedMoneyPage() {
   const getSortedEntries = () => {
     let sorted = entries
       .filter((entry) =>
-        entry.personName.toLowerCase().includes(searchTerm.toLowerCase())
+        entry.personName.trim().toLowerCase().includes(searchTerm.trim().toLowerCase())
       );
 
     if (appliedFilters.sortBy !== 'none' && sorted.length > 0) {
@@ -362,9 +424,9 @@ function IAmOwedMoneyPage() {
 
                   <div className="entry-details">
                     <div className="detail-row">
-                      <span className="label">Original Amount:</span>
-                      <span className="value amount">
-                        {entry.amount.toLocaleString('en-PK')} PKR
+                      <span className="label">Remaining Amount:</span>
+                      <span className="value remaining">
+                        {(entry.remaining ?? entry.amount).toLocaleString('en-PK')} PKR
                       </span>
                     </div>
                     {entry.totalPaid > 0 && (
@@ -372,14 +434,6 @@ function IAmOwedMoneyPage() {
                         <span className="label">Paid So Far:</span>
                         <span className="value paid">
                           {entry.totalPaid.toLocaleString('en-PK')} PKR
-                        </span>
-                      </div>
-                    )}
-                    {entry.remaining && entry.remaining > 0 && (
-                      <div className="detail-row">
-                        <span className="label">Remaining:</span>
-                        <span className="value remaining">
-                          {entry.remaining.toLocaleString('en-PK')} PKR
                         </span>
                       </div>
                     )}
@@ -418,7 +472,7 @@ function IAmOwedMoneyPage() {
                         {expandedPayments[entry.id] && (
                           <div className="payment-history-list">
                             {entry.payments.map((payment, index) => (
-                              <div key={index} className={`payment-item ${payment.type}`}>
+                              <div key={index} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction(payment)}>
                                 <span className="payment-date">{formatDate(payment.date)}</span>
                                 <span className={`payment-amount ${payment.type}`}>
                                   {payment.type === 'payment' ? '-' : '+'}{payment.amount.toLocaleString('en-PK')} PKR
@@ -468,7 +522,7 @@ function IAmOwedMoneyPage() {
                   {showPaymentForm === entry.id && (
                     <PaymentForm
                       isOwedMoney={true}
-                      onSubmit={(amount, date, desc, type) => handleRecordPayment(entry.id, amount, date, desc, type)}
+                      onSubmit={(amount, date, desc, type, imageUrl) => handleRecordPayment(entry.id, amount, date, desc, type, imageUrl)}
                       onCancel={() => setShowPaymentForm(null)}
                     />
                   )}
@@ -527,6 +581,16 @@ function IAmOwedMoneyPage() {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
+
+      {/* Transaction Detail Modal */}
+      {selectedTransaction && (
+        <TransactionDetailModal
+          payment={selectedTransaction}
+          onClose={() => setSelectedTransaction(null)}
+          onUpdate={fetchEntries}
+          onDelete={fetchEntries}
+        />
+      )}
     </div>
   );
 }
