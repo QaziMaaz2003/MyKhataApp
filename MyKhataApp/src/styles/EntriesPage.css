@@ -307,20 +307,20 @@
 }
 
 .entry-card {
-  background: white;
-  border-radius: 12px;
+  background: linear-gradient(to bottom, #ffffff, #f8fbff);
+  border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 2px solid #7cc8f8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 2px solid #2563eb;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
 }
 
 .entry-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  border-color: #4ca3f8;
-  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+  border-color: #1d4ed8;
+  transform: translateY(-6px);
 }
 
 .entry-header {
@@ -333,29 +333,31 @@
 
 .entry-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #212529;
+  font-size: 19px;
+  font-weight: 800;
+  color: #1e293b;
   flex: 1;
+  letter-spacing: -0.3px;
 }
 
 .status-badge {
   font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
+  font-weight: 700;
+  padding: 6px 14px;
   border-radius: 20px;
   white-space: nowrap;
   flex-shrink: 0;
+  letter-spacing: 0.3px;
 }
 
 .status-badge.pending {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: #fbbf24;
+  color: #78350f;
 }
 
 .status-badge.completed {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: #10b981;
+  color: white;
 }
 
 /* Entry Details */
@@ -375,15 +377,18 @@
 }
 
 .detail-row .label {
-  color: #6c757d;
-  font-weight: 600;
+  color: #475569;
+  font-weight: 700;
   min-width: 80px;
+  font-size: 13px;
+  text-transform: capitalize;
 }
 
 .detail-row .value {
-  color: #212529;
+  color: #1e293b;
   text-align: right;
   flex: 1;
+  font-weight: 600;
 }
 
 .detail-row .value.amount {
@@ -480,21 +485,25 @@
 }
 
 .btn-edit {
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  font-weight: 700;
 }
 
 .btn-edit:hover {
-  background-color: #bbdefb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-delete {
-  background-color: #ffebee;
-  color: #d32f2f;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  font-weight: 700;
 }
 
 .btn-delete:hover {
-  background-color: #ffcdd2;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Empty State */
@@ -549,7 +558,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: #7cc8f8;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: white;
   border: none;
   display: flex;
@@ -557,15 +566,18 @@
   justify-content: center;
   cursor: pointer;
   font-size: 24px;
-  box-shadow: 0 4px 12px rgba(124, 200, 248, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
   transition: all 0.3s ease;
   z-index: 100;
 }
 
 .fab-button:hover {
-  background-color: #4ca3f8;
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(76, 163, 248, 0.6);
+  transform: scale(1.12);
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.6);
+}
+
+.fab-button:active {
+  transform: scale(0.95);
 }
 
 .fab-button:active {
@@ -647,12 +659,14 @@
 }
 
 .btn-payment {
-  background-color: #c8e6c9;
-  color: #2e7d32;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-weight: 700;
 }
 
 .btn-payment:hover {
-  background-color: #a5d6a7;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Payment History Styles */
@@ -667,8 +681,8 @@
   align-items: center;
   background: none;
   border: none;
-  color: #4ca3f8;
-  font-weight: 600;
+  color: #2563eb;
+  font-weight: 700;
   font-size: 13px;
   cursor: pointer;
   padding: 0;
@@ -677,7 +691,7 @@
 }
 
 .payment-history-toggle:hover {
-  color: #2196f3;
+  color: #1d4ed8;
 }
 
 .payment-history-list {
@@ -736,13 +750,15 @@
 }
 
 .detail-row .remaining {
-  color: #ff9800;
-  font-weight: 600;
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 15px;
 }
 
 .detail-row .paid {
-  color: #2e7d32;
-  font-weight: 500;
+  color: #059669;
+  font-weight: 800;
+  font-size: 15px;
 }
 
 /* Mobile Responsive */
