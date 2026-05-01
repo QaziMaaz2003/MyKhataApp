@@ -472,7 +472,7 @@ function IAmOwedMoneyPage() {
                         {expandedPayments[entry.id] && (
                           <div className="payment-history-list">
                             {entry.payments.map((payment, index) => (
-                              <div key={index} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction(payment)}>
+                              <div key={index} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction({ payment, entryRemaining: entry.remaining })}>
                                 <span className="payment-date">{formatDate(payment.date)}</span>
                                 <span className={`payment-amount ${payment.type}`}>
                                   {payment.type === 'payment' ? '-' : '+'}{payment.amount.toLocaleString('en-PK')} PKR
@@ -585,7 +585,8 @@ function IAmOwedMoneyPage() {
       {/* Transaction Detail Modal */}
       {selectedTransaction && (
         <TransactionDetailModal
-          payment={selectedTransaction}
+          payment={selectedTransaction.payment}
+          remainingAmount={selectedTransaction.entryRemaining}
           onClose={() => setSelectedTransaction(null)}
           onUpdate={fetchEntries}
           onDelete={fetchEntries}
