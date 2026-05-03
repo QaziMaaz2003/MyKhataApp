@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { FiArrowRight, FiMenu } from 'react-icons/fi';
+import { FiArrowRight, FiMenu, FiSearch } from 'react-icons/fi';
 import Sidebar from '../components/Sidebar';
 import BreakdownChart from '../components/BreakdownChart';
+import PersonTransactionHistoryModal from '../components/PersonTransactionHistoryModal';
 import '../styles/Dashboard.css';
 
 function Dashboard() {
@@ -22,6 +23,11 @@ function Dashboard() {
   const [iOweCompletedCount, setIOweCompletedCount] = useState(0);
   const [iAmOwedPendingCount, setIAmOwedPendingCount] = useState(0);
   const [iAmOwedCompletedCount, setIAmOwedCompletedCount] = useState(0);
+  
+  // Transaction history modal state
+  const [selectedPersonEntry, setSelectedPersonEntry] = useState(null);
+  const [showPersonHistoryModal, setShowPersonHistoryModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -60,11 +66,27 @@ function Dashboard() {
       setIAmOwedPendingCount(iAmOwedPending);
       setIAmOwedCompletedCount(iAmOwedCompleted);
 
-      // Combine and sort recent entries
+      // Helper function to get the most recent transaction date for an entry
+      const getMostRecentTransactionDate = (entry) => {
+        let mostRecent = new Date(entry.date);
+        
+        if (entry.payments && entry.payments.length > 0) {
+          entry.payments.forEach(payment => {
+            const paymentDate = new Date(payment.date);
+            if (paymentDate > mostRecent) {
+              mostRecent = paymentDate;
+            }
+          });
+        }
+        
+        return mostRecent;
+      };
+
+      // Combine and sort recent entries by most recent transaction
       const combined = [
         ...iOweData.map(e => ({ ...e, type: 'owe' })),
         ...iAmOwedData.map(e => ({ ...e, type: 'owed' }))
-      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+      ].sort((a, b) => getMostRecentTransactionDate(b) - getMostRecentTransactionDate(a));
 
       setRecentEntries(combined);
     } catch (error) {
@@ -73,6 +95,11 @@ function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewPersonHistory = (entry) => {
+    setSelectedPersonEntry(entry);
+    setShowPersonHistoryModal(true);
   };
 
   const handleLogout = () => {
@@ -226,22 +253,48 @@ function Dashboard() {
         {/* Recent Entries */}
         <div className="recent-section">
           <h2 className="section-title">Recent Entries</h2>
+          <div className="entries-search-bar">
+            <FiSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by person name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
           {recentEntries.length > 0 ? (
             <div className="entries-list">
-              {recentEntries.map((entry) => (
-                <div key={entry.id} className={`entry-item ${entry.type}`}>
-                  <div className="entry-info">
-                    <h4>{entry.personName}</h4>
-                    <p className="entry-date">{formatDate(entry.date)}</p>
+              {(() => {
+                const filteredEntries = recentEntries.filter((entry) => 
+                  entry.personName.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                
+                if (filteredEntries.length === 0) {
+                  return <div className="no-entries"><p>No entries match your search</p></div>;
+                }
+                
+                return filteredEntries.map((entry) => (
+                  <div 
+                    key={entry.id} 
+                    className={`entry-item ${entry.type}`}
+                    onClick={() => handleViewPersonHistory(entry)}
+                    style={{ cursor: 'pointer' }}
+                    title="Click to view transaction history"
+                  >
+                    <div className="entry-info">
+                      <h4>{entry.personName}</h4>
+                      <p className="entry-date">{formatDate(entry.date)}</p>
+                    </div>
+                    <div className="entry-amount">
+                      <span className={`amount ${entry.type}`}>
+                        {entry.type === 'owe' ? '-' : '+'}
+                        {entry.amount.toLocaleString('en-PK')} PKR
+                      </span>
+                    </div>
                   </div>
-                  <div className="entry-amount">
-                    <span className={`amount ${entry.type}`}>
-                      {entry.type === 'owe' ? '-' : '+'}
-                      {entry.amount.toLocaleString('en-PK')} PKR
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
           ) : (
             <div className="no-entries">
@@ -252,6 +305,13 @@ function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* Transaction History Modal */}
+        <PersonTransactionHistoryModal 
+          entry={selectedPersonEntry}
+          isOpen={showPersonHistoryModal}
+          onClose={() => setShowPersonHistoryModal(false)}
+        />
       </main>
     </div>
   );
