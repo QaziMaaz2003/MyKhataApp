@@ -131,7 +131,6 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
       const summaryData = [
         ['Person Name:', entry.personName],
         ['Total Paid:', formatCurrency(totalPaid)],
-        ['Additional Debt:', formatCurrency(additionalDebt)],
         ['Remaining Amount:', formatCurrency(remainingAmount)],
         ['Created Date:', formatDate(entry.date)],
       ];

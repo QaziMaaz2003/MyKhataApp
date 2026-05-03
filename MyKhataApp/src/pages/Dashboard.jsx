@@ -289,7 +289,7 @@ function Dashboard() {
                     <div className="entry-amount">
                       <span className={`amount ${entry.type}`}>
                         {entry.type === 'owe' ? '-' : '+'}
-                        {entry.amount.toLocaleString('en-PK')} PKR
+                        {(entry.remaining || entry.amount).toLocaleString('en-PK')} PKR
                       </span>
                     </div>
                   </div>
