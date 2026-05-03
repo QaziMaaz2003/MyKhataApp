@@ -154,9 +154,9 @@ function IOweMoneyPage() {
   const [editingEntry, setEditingEntry] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('none');
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [appliedFilters, setAppliedFilters] = useState({ sortBy: 'none', sortOrder: 'asc' });
+  const [sortBy, setSortBy] = useState('recent');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [appliedFilters, setAppliedFilters] = useState({ sortBy: 'recent', sortOrder: 'desc' });
   const [deleteConfirmation, setDeleteConfirmation] = useState({ isOpen: false, entryId: null });
   const [expandedPayments, setExpandedPayments] = useState({});
   const [showPaymentForm, setShowPaymentForm] = useState(null);
@@ -288,15 +288,34 @@ function IOweMoneyPage() {
     return status === 'completed' ? '✓ Completed' : '● Pending';
   };
 
+  const getMostRecentDate = (entry) => {
+    try {
+      if (entry.payments && Array.isArray(entry.payments) && entry.payments.length > 0) {
+        const dates = entry.payments.map(p => new Date(p.date).getTime()).filter(d => !isNaN(d));
+        if (dates.length > 0) {
+          const maxDate = Math.max(...dates);
+          console.log(`Entry "${entry.personName}": Found ${entry.payments.length} payments, most recent: ${new Date(maxDate).toLocaleDateString()}`);
+          return maxDate;
+        }
+      }
+    } catch (e) {
+      console.error('Error getting recent date:', e);
+    }
+    const entryDate = new Date(entry.date).getTime();
+    console.log(`Entry "${entry.personName}": No payments, using creation date: ${new Date(entryDate).toLocaleDateString()}`);
+    return entryDate;
+  };
+
   const getSortedEntries = () => {
     let sorted = entries
       .filter((entry) =>
         entry.personName.trim().toLowerCase().includes(searchTerm.trim().toLowerCase())
       );
 
-    if (appliedFilters.sortBy !== 'none' && sorted.length > 0) {
+    // Always sort if appliedFilters.sortBy is set (even if 'none', which shouldn't happen but just in case)
+    if (sorted.length > 0) {
       sorted = [...sorted].sort((a, b) => {
-        let compareA, compareB;
+        let compareA = 0, compareB = 0;
 
         if (appliedFilters.sortBy === 'amount') {
           compareA = a.amount;
@@ -304,12 +323,17 @@ function IOweMoneyPage() {
         } else if (appliedFilters.sortBy === 'date') {
           compareA = new Date(a.date).getTime();
           compareB = new Date(b.date).getTime();
+        } else if (appliedFilters.sortBy === 'recent') {
+          compareA = getMostRecentDate(a);
+          compareB = getMostRecentDate(b);
+          console.log(`Sorting by recent: ${a.personName} (${new Date(compareA).toLocaleDateString()}) vs ${b.personName} (${new Date(compareB).toLocaleDateString()})`);
         } else if (appliedFilters.sortBy === 'dueDate') {
           compareA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
           compareB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
         }
 
-        return appliedFilters.sortOrder === 'asc' ? compareA - compareB : compareB - compareA;
+        const result = appliedFilters.sortOrder === 'asc' ? compareA - compareB : compareB - compareA;
+        return result;
       });
     }
 
@@ -321,9 +345,9 @@ function IOweMoneyPage() {
   };
 
   const handleClearFilters = () => {
-    setSortBy('none');
-    setSortOrder('asc');
-    setAppliedFilters({ sortBy: 'none', sortOrder: 'asc' });
+    setSortBy('recent');
+    setSortOrder('desc');
+    setAppliedFilters({ sortBy: 'recent', sortOrder: 'desc' });
   };
 
   if (loading) {
@@ -387,6 +411,7 @@ function IOweMoneyPage() {
               className="filter-select"
             >
               <option value="none">Sort By</option>
+              <option value="recent">Recent Activity</option>
               <option value="amount">Amount</option>
               <option value="date">Date Taken</option>
               <option value="dueDate">Due Date</option>
