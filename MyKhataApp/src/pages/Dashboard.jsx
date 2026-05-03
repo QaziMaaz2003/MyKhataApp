@@ -37,7 +37,7 @@ function Dashboard() {
       const iOweData = iOweResponse.data.data.entries || [];
       const iOweTotal = iOweData
         .filter(entry => entry.status === 'pending')
-        .reduce((sum, entry) => sum + entry.amount, 0);
+        .reduce((sum, entry) => sum + (entry.remaining || entry.amount), 0);
       const iOwePending = iOweData.filter(e => e.status === 'pending').length;
       const iOweCompleted = iOweData.filter(e => e.status === 'completed').length;
       
@@ -51,7 +51,7 @@ function Dashboard() {
       const iAmOwedData = iAmOwedResponse.data.data.entries || [];
       const iAmOwedTotal = iAmOwedData
         .filter(entry => entry.status === 'pending')
-        .reduce((sum, entry) => sum + entry.amount, 0);
+        .reduce((sum, entry) => sum + (entry.remaining || entry.amount), 0);
       const iAmOwedPending = iAmOwedData.filter(e => e.status === 'pending').length;
       const iAmOwedCompleted = iAmOwedData.filter(e => e.status === 'completed').length;
       
@@ -183,7 +183,7 @@ function Dashboard() {
                 <div className="summary-item">
                   <span className="summary-label">Pending</span>
                   <span className="summary-value pending-color">{iOwePendingCount}</span>
-                  <span className="summary-amount">₨ {iOweEntries.filter(e => e.status === 'pending').reduce((sum, e) => sum + e.amount, 0).toLocaleString('en-PK')}</span>
+                  <span className="summary-amount">₨ {iOweEntries.filter(e => e.status === 'pending').reduce((sum, e) => sum + (e.remaining || e.amount), 0).toLocaleString('en-PK')}</span>
                 </div>
                 <div className="summary-divider"></div>
                 <div className="summary-item">
@@ -207,7 +207,7 @@ function Dashboard() {
                 <div className="summary-item">
                   <span className="summary-label">Pending</span>
                   <span className="summary-value pending-color">{iAmOwedPendingCount}</span>
-                  <span className="summary-amount">₨ {iAmOwedEntries.filter(e => e.status === 'pending').reduce((sum, e) => sum + e.amount, 0).toLocaleString('en-PK')}</span>
+                  <span className="summary-amount">₨ {iAmOwedEntries.filter(e => e.status === 'pending').reduce((sum, e) => sum + (e.remaining || e.amount), 0).toLocaleString('en-PK')}</span>
                 </div>
                 <div className="summary-divider"></div>
                 <div className="summary-item">
