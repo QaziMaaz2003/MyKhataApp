@@ -77,11 +77,6 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
     return sum + amount;
   }, 0);
 
-  // Additional debt = sum of all non-payment transactions
-  const additionalDebt = payments.reduce((sum, payment) => {
-    return sum + (payment.type !== 'payment' ? (payment.amount || 0) : 0);
-  }, 0);
-
   // Use entry.remaining directly (calculated on backend) for accuracy
   const remainingAmount = entry.remaining || 0;
 
