@@ -176,7 +176,7 @@ function IAmOwedMoneyPage() {
       // Calculate total from remaining amounts (not original amounts)
       const total = entriesData
         .filter(entry => entry.status === 'pending')
-        .reduce((sum, entry) => sum + (entry.remaining || entry.amount), 0);
+        .reduce((sum, entry) => sum + entry.remaining, 0);
       setTotalAmount(total);
     } catch (error) {
       console.error('Error fetching entries:', error);
