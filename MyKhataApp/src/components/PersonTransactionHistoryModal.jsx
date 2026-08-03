@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiX, FiDownload, FiGrid, FiList } from 'react-icons/fi';
 import jsPDF from 'jspdf';
+import { getEntryLedger } from '../utils/balance';
 import '../styles/PersonTransactionHistoryModal.css';
 
 export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }) {
@@ -42,10 +43,13 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
   /**
    * Format transaction type name based on context
    */
-  const formatTypeName = (type) => {
+  const formatTypeName = (type, isOpening) => {
     // Determine if this is a supplier (owe) or customer (owed) entry
     const isSupplier = entry.type === 'owe';
-    
+
+    if (isOpening) {
+      return 'Opening Balance';
+    }
     if (type === 'payment') {
       return isSupplier ? 'Money Paid' : 'Money Received';
     } else if (type === 'additional_debt') {
@@ -56,29 +60,13 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
 
   // ============ Data Calculations ============
 
-  const payments = entry.payments || [];
-  const originalAmount = entry.amount || 0;
-  
-  // Create combined transactions list with initial transaction first
-  const allTransactions = [
-    {
-      date: entry.date,
-      type: entry.type === 'owe' ? 'additional_debt' : 'additional_debt',
-      amount: originalAmount,
-      description: entry.description || '-',
-      imageUrl: null,
-    },
-    ...payments,
-  ];
-  
-  // Calculate total paid from all payments
-  const totalPaid = payments.reduce((sum, payment) => {
-    const amount = payment.type === 'payment' ? payment.amount || 0 : -(payment.amount || 0);
-    return sum + amount;
-  }, 0);
-
-  // Use entry.remaining directly (calculated on backend) for accuracy
-  const remainingAmount = entry.remaining || 0;
+  // Opening row + every payment in chronological order, each carrying the
+  // balance as it stood after that transaction.
+  const {
+    transactions: allTransactions,
+    totalPaid,
+    remaining: remainingAmount,
+  } = getEntryLedger(entry);
 
   // ============ PDF Generation ============
 
@@ -152,8 +140,8 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
       yPosition += 8;
 
       // Table Headers
-      const tableHeaders = ['Date', 'Type', 'Amount', 'Description'];
-      const colWidths = [22, 35, 25, 98];
+      const tableHeaders = ['Date', 'Type', 'Amount', 'Balance', 'Description'];
+      const colWidths = [22, 32, 24, 26, 76];
       const headerHeight = 7;
 
       pdf.setFontSize(9);
@@ -206,15 +194,20 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
         // Row data
         const rowData = [
           formatDate(transaction.date),
-          formatTypeName(transaction.type || 'payment'),
+          formatTypeName(transaction.type || 'payment', transaction.isOpening),
           formatCurrency(transaction.amount),
+          formatCurrency(transaction.balanceAfter),
           transaction.description || '-',
         ];
 
         xPos = 15;
         pdf.setFontSize(9);
         rowData.forEach((cellData, cellIndex) => {
-          pdf.text(cellData, xPos + 2, yPosition + 7);
+          // jsPDF does not wrap, so keep each cell inside its column
+          const text = String(cellData ?? '');
+          const lines = pdf.splitTextToSize(text, colWidths[cellIndex] - 4);
+          const cellText = lines.length > 1 ? `${lines[0].trimEnd()}...` : lines[0] || '';
+          pdf.text(cellText, xPos + 2, yPosition + 7);
           xPos += colWidths[cellIndex];
         });
 
@@ -351,6 +344,7 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
               <th>Date</th>
               <th>Type</th>
               <th>Amount</th>
+              <th>Balance</th>
               <th>Description</th>
               <th>Image</th>
             </tr>
@@ -361,10 +355,11 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
                 <td>{formatDate(transaction.date)}</td>
                 <td>
                   <span className={`type-badge type-${transaction.type}`}>
-                    {formatTypeName(transaction.type)}
+                    {formatTypeName(transaction.type, transaction.isOpening)}
                   </span>
                 </td>
                 <td className="amount-cell">{formatCurrency(transaction.amount)}</td>
+                <td className="balance-cell">{formatCurrency(transaction.balanceAfter)}</td>
                 <td className="description-cell">{transaction.description || '-'}</td>
                 <td>
                   {transaction.imageUrl ? (
@@ -404,7 +399,7 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
             <div key={index} className="transaction-card">
               <div className="card-header">
                 <span className={`type-badge type-${transaction.type}`}>
-                  {formatTypeName(transaction.type)}
+                  {formatTypeName(transaction.type, transaction.isOpening)}
                 </span>
                 <span className="card-date">{formatDate(transaction.date)}</span>
               </div>
@@ -414,6 +409,13 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
                   <span className="card-label">Amount</span>
                   <span className="card-value amount">
                     {formatCurrency(transaction.amount)}
+                  </span>
+                </div>
+
+                <div className="card-row">
+                  <span className="card-label">Balance</span>
+                  <span className="card-value balance">
+                    {formatCurrency(transaction.balanceAfter)}
                   </span>
                 </div>
 
