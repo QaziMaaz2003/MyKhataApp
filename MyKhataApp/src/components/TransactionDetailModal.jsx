@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import ImageLightbox from './ImageLightbox';
 import CameraCapture from './CameraCapture';
 
-export default function TransactionDetailModal({ payment, balanceAfter, remainingAmount, onClose, onUpdate, onDelete }) {
+export default function TransactionDetailModal({ payment, personName, balanceAfter, remainingAmount, onClose, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     amount: payment?.amount || '',
@@ -103,7 +103,10 @@ export default function TransactionDetailModal({ payment, balanceAfter, remainin
       <div className="txn-modal-overlay" onClick={onClose}>
         <div className="txn-modal" onClick={e => e.stopPropagation()}>
           <div className="txn-modal-header">
-            <h3>{isEditing ? 'Edit Transaction' : 'Transaction Details'}</h3>
+            <div>
+              <h3>{isEditing ? 'Edit Transaction' : 'Transaction Details'}</h3>
+              {personName && <p className="txn-modal-subtitle">{personName}</p>}
+            </div>
             <button className="txn-modal-close" onClick={onClose}>
               <FiX size={20} />
             </button>
