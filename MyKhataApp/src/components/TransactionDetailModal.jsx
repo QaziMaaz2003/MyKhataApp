@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import ImageLightbox from './ImageLightbox';
 import CameraCapture from './CameraCapture';
 
-export default function TransactionDetailModal({ payment, remainingAmount, onClose, onUpdate, onDelete }) {
+export default function TransactionDetailModal({ payment, balanceAfter, remainingAmount, onClose, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     amount: payment?.amount || '',
@@ -210,9 +210,17 @@ export default function TransactionDetailModal({ payment, remainingAmount, onClo
                     <span className="txn-detail-value">{payment.description}</span>
                   </div>
                 )}
+                {balanceAfter !== undefined && (
+                  <div className="txn-detail-row">
+                    <span className="txn-detail-label">Balance After This Transaction</span>
+                    <span className="txn-detail-value" style={{ color: '#dc2626', fontWeight: '700' }}>
+                      {balanceAfter.toLocaleString('en-PK')} PKR
+                    </span>
+                  </div>
+                )}
                 {remainingAmount !== undefined && (
                   <div className="txn-detail-row">
-                    <span className="txn-detail-label">Remaining Balance</span>
+                    <span className="txn-detail-label">Current Remaining Balance</span>
                     <span className="txn-detail-value" style={{ color: '#2e7d32', fontWeight: '600' }}>
                       {remainingAmount.toLocaleString('en-PK')} PKR
                     </span>

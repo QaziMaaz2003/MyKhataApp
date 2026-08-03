@@ -260,6 +260,13 @@
   color: #4CA3F8;
 }
 
+/* Remaining balance as it stood after each transaction */
+.balance-cell {
+  font-weight: 700;
+  color: #dc3545;
+  white-space: nowrap;
+}
+
 .description-cell {
   max-width: 200px;
   overflow: hidden;
@@ -393,6 +400,12 @@
   font-size: 16px;
   font-weight: 700;
   color: #28a745;
+}
+
+.card-value.balance {
+  font-size: 16px;
+  font-weight: 700;
+  color: #dc3545;
 }
 
 .card-image-section {

@@ -704,6 +704,7 @@
 
 .payment-item {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 8px 0;
   align-items: center;
@@ -747,6 +748,15 @@
   font-size: 12px;
   color: #999;
   font-style: italic;
+}
+
+/* Remaining balance as it stood after this transaction */
+.payment-balance {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: #dc2626;
+  white-space: nowrap;
 }
 
 .detail-row .remaining {

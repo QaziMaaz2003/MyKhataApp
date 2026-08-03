@@ -9,6 +9,7 @@ import ImageLightbox from '../components/ImageLightbox';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import TransactionDetailModal from '../components/TransactionDetailModal';
 import CameraCapture from '../components/CameraCapture';
+import { getEntryLedger } from '../utils/balance';
 import '../styles/EntriesPage.css';
 
 function PaymentForm({ onSubmit, onCancel, isOwedMoney = true }) {
@@ -496,8 +497,8 @@ function IAmOwedMoneyPage() {
                         </button>
                         {expandedPayments[entry.id] && (
                           <div className="payment-history-list">
-                            {entry.payments.map((payment, index) => (
-                              <div key={index} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction({ payment, entryRemaining: entry.remaining })}>
+                            {getEntryLedger(entry).rows.map((payment) => (
+                              <div key={payment.id} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction({ payment, balanceAfter: payment.balanceAfter, entryRemaining: entry.remaining })}>
                                 <span className="payment-date">{formatDate(payment.date)}</span>
                                 <span className={`payment-amount ${payment.type}`}>
                                   {payment.type === 'payment' ? '-' : '+'}{payment.amount.toLocaleString('en-PK')} PKR
@@ -508,6 +509,9 @@ function IAmOwedMoneyPage() {
                                 {payment.description && (
                                   <span className="payment-desc">{payment.description}</span>
                                 )}
+                                <span className="payment-balance" title="Remaining balance after this transaction">
+                                  Balance: {payment.balanceAfter.toLocaleString('en-PK')} PKR
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -611,6 +615,7 @@ function IAmOwedMoneyPage() {
       {selectedTransaction && (
         <TransactionDetailModal
           payment={selectedTransaction.payment}
+          balanceAfter={selectedTransaction.balanceAfter}
           remainingAmount={selectedTransaction.entryRemaining}
           onClose={() => setSelectedTransaction(null)}
           onUpdate={fetchEntries}
