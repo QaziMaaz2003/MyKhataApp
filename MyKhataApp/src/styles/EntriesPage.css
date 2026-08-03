@@ -918,6 +918,12 @@
   font-size: 16px;
   font-weight: 600;
 }
+.txn-modal-subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
 .txn-modal-close {
   background: none;
   border: none;

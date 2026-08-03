@@ -498,7 +498,7 @@ function IOweMoneyPage() {
                         {expandedPayments[entry.id] && (
                           <div className="payment-history-list">
                             {getEntryLedger(entry).rows.map((payment) => (
-                              <div key={payment.id} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction({ payment, balanceAfter: payment.balanceAfter, entryRemaining: entry.remaining })}>
+                              <div key={payment.id} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction({ payment, balanceAfter: payment.balanceAfter, entryRemaining: entry.remaining, personName: entry.personName })}>
                                 <span className="payment-date">{formatDate(payment.date)}</span>
                                 <span className={`payment-amount ${payment.type}`}>
                                   {payment.type === 'payment' ? '-' : '+'}{payment.amount.toLocaleString('en-PK')} PKR
@@ -615,6 +615,7 @@ function IOweMoneyPage() {
       {selectedTransaction && (
         <TransactionDetailModal
           payment={selectedTransaction.payment}
+          personName={selectedTransaction.personName}
           balanceAfter={selectedTransaction.balanceAfter}
           remainingAmount={selectedTransaction.entryRemaining}
           onClose={() => setSelectedTransaction(null)}
