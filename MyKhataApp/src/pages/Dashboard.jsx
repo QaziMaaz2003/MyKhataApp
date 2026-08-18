@@ -6,6 +6,8 @@ import { FiArrowRight, FiMenu, FiSearch } from 'react-icons/fi';
 import Sidebar from '../components/Sidebar';
 import BreakdownChart from '../components/BreakdownChart';
 import PersonTransactionHistoryModal from '../components/PersonTransactionHistoryModal';
+import PeriodReportBar from '../components/PeriodReportBar';
+import PeriodReportModal from '../components/PeriodReportModal';
 import '../styles/Dashboard.css';
 
 function Dashboard() {
@@ -28,6 +30,11 @@ function Dashboard() {
   const [selectedPersonEntry, setSelectedPersonEntry] = useState(null);
   const [showPersonHistoryModal, setShowPersonHistoryModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Period report state
+  const [reportPeriodType, setReportPeriodType] = useState('daily');
+  const [reportDate, setReportDate] = useState(new Date());
+  const [showReportModal, setShowReportModal] = useState(false);
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -155,6 +162,16 @@ function Dashboard() {
             </button>
           </div>
         </div>
+
+        {/* Period Report */}
+        <PeriodReportBar
+          periodType={reportPeriodType}
+          onPeriodTypeChange={setReportPeriodType}
+          date={reportDate}
+          onDateChange={setReportDate}
+          onGenerate={() => setShowReportModal(true)}
+          disabled={loading}
+        />
 
         {/* Stats Cards */}
         <div className="stats-container">
@@ -307,10 +324,21 @@ function Dashboard() {
         </div>
 
         {/* Transaction History Modal */}
-        <PersonTransactionHistoryModal 
+        <PersonTransactionHistoryModal
           entry={selectedPersonEntry}
           isOpen={showPersonHistoryModal}
           onClose={() => setShowPersonHistoryModal(false)}
+        />
+
+        {/* Period Report Modal */}
+        <PeriodReportModal
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          periodType={reportPeriodType}
+          anchorDate={reportDate}
+          oweEntries={iOweEntries}
+          owedEntries={iAmOwedEntries}
+          userName={user.name}
         />
       </main>
     </div>
