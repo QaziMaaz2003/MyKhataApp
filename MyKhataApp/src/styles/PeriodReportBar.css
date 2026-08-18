@@ -1,0 +1,205 @@
+/**
+ * Dashboard report bar - period selector, date picker and Generate button.
+ *
+ * The date-picker classes are deliberately NOT reused from Modal.css. That file
+ * is only injected when a module importing it is loaded, and Dashboard.jsx does
+ * not import AddEditEntryForm - so `.date-input-wrapper` / `.date-picker-overlay`
+ * are not reliably present on this route. Same reason the react-calendar
+ * overrides below are scoped: Modal.css and Auth.css already disagree about
+ * `.react-calendar__tile--active` (purple vs blue) and a third unscoped
+ * competitor would make it worse.
+ */
+
+.report-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 30px;
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.report-bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.report-bar-label svg { color: #4ca3f8; }
+
+/* =============== Segmented period selector =============== */
+.report-segment-group {
+  display: inline-flex;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.report-segment {
+  padding: 9px 18px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.report-segment:hover:not(.active) { background: #eaf4ff; color: #212529; }
+
+.report-segment.active {
+  background: linear-gradient(135deg, #7cc8f8 0%, #4ca3f8 100%);
+  color: white;
+}
+
+/* =============== Date field + calendar popover =============== */
+.report-date-wrapper { position: relative; }
+
+.report-date-input {
+  padding: 10px 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #212529;
+  background: white;
+  cursor: pointer;
+  min-width: 165px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.report-date-input:hover { border-color: #4ca3f8; }
+
+.report-date-input:focus {
+  outline: none;
+  border-color: #4ca3f8;
+  box-shadow: 0 0 0 3px rgba(76, 163, 248, 0.15);
+}
+
+/* Full-screen catcher so a click anywhere closes the popover. */
+.report-calendar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+}
+
+.report-calendar-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 901;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+}
+
+.report-calendar-popover .react-calendar {
+  width: 300px;
+  max-width: 100%;
+  border: none;
+  font-family: inherit;
+  background: transparent;
+}
+
+.report-calendar-popover .react-calendar__navigation button {
+  font-size: 14px;
+  font-weight: 600;
+  color: #212529;
+  border-radius: 6px;
+}
+
+.report-calendar-popover .react-calendar__navigation button:enabled:hover,
+.report-calendar-popover .react-calendar__navigation button:enabled:focus {
+  background: #eaf4ff;
+}
+
+.report-calendar-popover .react-calendar__tile {
+  padding: 11px 4px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+.report-calendar-popover .react-calendar__tile:enabled:hover,
+.report-calendar-popover .react-calendar__tile:enabled:focus {
+  background: #eaf4ff;
+}
+
+/* The whole Mon-Sun band, so "pick any day, get its week" is self-evident. */
+.report-calendar-popover .report-tile-in-week {
+  background: #eaf4ff;
+  color: #17557e;
+}
+
+.report-calendar-popover .react-calendar__tile--now { background: #fff3cd; }
+
+.report-calendar-popover .react-calendar__tile--active,
+.report-calendar-popover .react-calendar__tile--active:enabled:hover,
+.report-calendar-popover .react-calendar__tile--active:enabled:focus {
+  background: linear-gradient(135deg, #7cc8f8 0%, #4ca3f8 100%);
+  color: white;
+}
+
+/* =============== Range hint =============== */
+.report-range-hint {
+  font-size: 13px;
+  color: #6c757d;
+  flex: 1;
+  min-width: 180px;
+}
+
+.report-range-hint strong { color: #212529; }
+
+/* =============== Generate button =============== */
+.report-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #7cc8f8 0%, #4ca3f8 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.report-generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 163, 248, 0.4);
+}
+
+.report-generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* =============== Responsive =============== */
+@media (max-width: 768px) {
+  .report-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 20px;
+    gap: 12px;
+  }
+
+  .report-segment-group { width: 100%; }
+  .report-segment { flex: 1; padding: 10px 8px; }
+
+  .report-date-wrapper { width: 100%; }
+  .report-date-input { width: 100%; min-width: 0; }
+
+  .report-calendar-popover { left: 0; right: 0; }
+  .report-calendar-popover .react-calendar { width: 100%; }
+
+  .report-generate-btn { justify-content: center; }
+  .report-range-hint { text-align: center; }
+}
