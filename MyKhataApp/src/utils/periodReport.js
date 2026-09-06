@@ -174,12 +174,16 @@ const chronological = (a, b) =>
  * @param {object[]} args.owedEntries  raw IAmOwedMoney entries (with payments[])
  * @param {'daily'|'weekly'|'monthly'} args.periodType
  * @param {Date}     args.anchorDate   any date inside the desired period
+ * @param {string}   [args.scopeLabel] when set (e.g. a person's name), prefixes
+ *   `meta.title` - lets a caller reuse this same report for a filtered subset
+ *   of entries without the heading still reading like a global report.
  */
 export function buildPeriodReport({
   oweEntries = [],
   owedEntries = [],
   periodType = 'daily',
   anchorDate = new Date(),
+  scopeLabel,
 } = {}) {
   const { start, end } = getPeriodRange(periodType, anchorDate);
 
@@ -365,7 +369,9 @@ export function buildPeriodReport({
       end,
       endInclusive: inclusiveEnd(end),
       label: formatPeriodLabel(periodType, start, end),
-      title: PERIOD_LABELS[periodType].title,
+      title: scopeLabel
+        ? `${scopeLabel} - ${PERIOD_LABELS[periodType].title}`
+        : PERIOD_LABELS[periodType].title,
       unit: PERIOD_LABELS[periodType].unit,
       isInProgress: end > new Date(),
       generatedAt: new Date(),

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { FiMenu, FiPlus, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
+import { FiMenu, FiPlus, FiEdit2, FiTrash2, FiSearch, FiFileText } from 'react-icons/fi';
 import Sidebar from '../components/Sidebar';
 import AddEditEntryForm from '../components/AddEditEntryForm';
 import ImageLightbox from '../components/ImageLightbox';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import TransactionDetailModal from '../components/TransactionDetailModal';
 import CameraCapture from '../components/CameraCapture';
+import PeriodReportModal from '../components/PeriodReportModal';
 import { getEntryLedger } from '../utils/balance';
 import '../styles/EntriesPage.css';
 
@@ -162,6 +163,7 @@ function IAmOwedMoneyPage() {
   const [expandedPayments, setExpandedPayments] = useState({});
   const [showPaymentForm, setShowPaymentForm] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [personReport, setPersonReport] = useState(null);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
@@ -497,7 +499,7 @@ function IAmOwedMoneyPage() {
                         </button>
                         {expandedPayments[entry.id] && (
                           <div className="payment-history-list">
-                            {getEntryLedger(entry).rows.map((payment) => (
+                            {[...getEntryLedger(entry).rows].reverse().map((payment) => (
                               <div key={payment.id} className={`payment-item ${payment.type} clickable-payment`} onClick={() => setSelectedTransaction({ payment, balanceAfter: payment.balanceAfter, entryRemaining: entry.remaining, personName: entry.personName })}>
                                 <span className="payment-date">{formatDate(payment.date)}</span>
                                 <span className={`payment-amount ${payment.type}`}>
@@ -537,6 +539,13 @@ function IAmOwedMoneyPage() {
                     <button className="btn btn-sm btn-edit" onClick={() => handleEditEntry(entry)}>
                       <FiEdit2 size={16} />
                       Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-report"
+                      onClick={() => setPersonReport({ personName: entry.personName })}
+                    >
+                      <FiFileText size={16} />
+                      Report
                     </button>
                     <button
                       className="btn btn-sm btn-delete"
@@ -621,6 +630,20 @@ function IAmOwedMoneyPage() {
           onClose={() => setSelectedTransaction(null)}
           onUpdate={fetchEntries}
           onDelete={fetchEntries}
+        />
+      )}
+
+      {/* Per-person Report Modal */}
+      {personReport && (
+        <PeriodReportModal
+          isOpen={!!personReport}
+          onClose={() => setPersonReport(null)}
+          periodType="daily"
+          anchorDate={new Date()}
+          oweEntries={[]}
+          owedEntries={entries.filter((e) => e.personName === personReport.personName)}
+          userName={user?.name}
+          scopeLabel={personReport.personName}
         />
       )}
     </div>

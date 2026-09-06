@@ -68,6 +68,10 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
     remaining: remainingAmount,
   } = getEntryLedger(entry);
 
+  // On-screen lists show newest first; the PDF keeps `allTransactions` (oldest
+  // first) since a statement's running balance reads naturally top-to-bottom.
+  const displayTransactions = [...allTransactions].reverse();
+
   // ============ PDF Generation ============
 
   const generatePDF = async () => {
@@ -333,7 +337,7 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
    */
   const renderTableView = () => (
     <div className="transaction-history-table">
-      {allTransactions.length === 0 ? (
+      {displayTransactions.length === 0 ? (
         <div className="empty-state">
           <p>No transactions yet</p>
         </div>
@@ -350,7 +354,7 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
             </tr>
           </thead>
           <tbody>
-            {allTransactions.map((transaction, index) => (
+            {displayTransactions.map((transaction, index) => (
               <tr key={index} className={index % 2 === 0 ? 'row-even' : 'row-odd'}>
                 <td>{formatDate(transaction.date)}</td>
                 <td>
@@ -389,13 +393,13 @@ export default function PersonTransactionHistoryModal({ entry, onClose, isOpen }
    */
   const renderCardsView = () => (
     <div className="transaction-history-cards">
-      {allTransactions.length === 0 ? (
+      {displayTransactions.length === 0 ? (
         <div className="empty-state">
           <p>No transactions yet</p>
         </div>
       ) : (
         <div className="cards-grid">
-          {allTransactions.map((transaction, index) => (
+          {displayTransactions.map((transaction, index) => (
             <div key={index} className="transaction-card">
               <div className="card-header">
                 <span className={`type-badge type-${transaction.type}`}>

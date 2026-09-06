@@ -46,6 +46,7 @@ export default function PeriodReportModal({
   oweEntries,
   owedEntries,
   userName,
+  scopeLabel,
 }) {
   // Seeded from props so the Dashboard bar sets the starting point, but held
   // locally so the user can flip period without closing the modal.
@@ -88,6 +89,7 @@ export default function PeriodReportModal({
     owedEntries,
     periodType: localPeriod,
     anchorDate: localDate,
+    scopeLabel,
   });
 
   const { meta, summary, people, transactions } = report;
