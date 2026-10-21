@@ -930,10 +930,10 @@
   font-weight: 600;
 }
 .txn-modal-subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: #666;
-  font-weight: 500;
+  margin: 4px 0 0;
+  font-size: 17px;
+  color: #111;
+  font-weight: 700;
 }
 .txn-modal-close {
   background: none;
