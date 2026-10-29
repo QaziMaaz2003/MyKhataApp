@@ -625,6 +625,7 @@ function IAmOwedMoneyPage() {
         <TransactionDetailModal
           payment={selectedTransaction.payment}
           personName={selectedTransaction.personName}
+          userName={user?.name}
           balanceAfter={selectedTransaction.balanceAfter}
           remainingAmount={selectedTransaction.entryRemaining}
           onClose={() => setSelectedTransaction(null)}
